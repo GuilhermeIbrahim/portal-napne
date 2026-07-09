@@ -23,7 +23,7 @@ para a comunidade escolar.
 
 ## Tecnologias Utilizadas
 
-[![SkillIcons](https://skillicons.dev/icons?i=py,html,css,django,bootstrap)](https://skillicons.dev)
+[![SkillIcons](https://skillicons.dev/icons?i=py,html,django,bootstrap)](https://skillicons.dev)
 
 ---
 
