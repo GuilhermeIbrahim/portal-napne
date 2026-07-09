@@ -1,4 +1,4 @@
-# Sobra o projeto - Portal Napne
+# Sobre o projeto - Portal Napne
 
 O projeto Portal NAPNE é pensado tendo como objetivo o atendimento das
 demandas do Núcleo de Atendimento para as Pessoas com Necessidades
