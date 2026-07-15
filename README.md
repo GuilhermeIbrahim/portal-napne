@@ -1,13 +1,21 @@
 # Sobre o projeto - Portal Napne
 
-O projeto Portal NAPNE é pensado tendo como objetivo o atendimento das
-demandas do Núcleo de Atendimento para as Pessoas com Necessidades
-Educacionais Específicas (NAPNE) do Instituto Federal de Educação, Ciência e
-Tecnologia do Rio Grande do Norte (IFRN) campus São Paulo do Potengi (SPP),
-principalmente ao que se refere às dificuldades enfrentadas quanto ao envio (por
-parte dos professores) e recebimento (por parte do NAPNE) do Plano Educacional
-Individualizado (PEI), além da disseminação dos comunicados e das ações do núcleo
-para a comunidade escolar.
+O presente projeto propõe o desenvolvimento do Portal NAPNE, um sistema web
+destinado a centralizar e otimizar os processos de comunicação e gestão
+documental do Núcleo de Atendimento às Pessoas com Necessidades Educacionais
+Específicas (NAPNE) do Instituto Federal de Educação, Ciência e Tecnologia do Rio
+Grande do Norte (IFRN), Campus São Paulo do Potengi. A proposta busca
+solucionar dificuldades relacionadas ao envio, recebimento e acompanhamento do
+Plano Educacional Individualizado (PEI), bem como ampliar a divulgação das ações
+do núcleo e fortalecer a comunicação com a comunidade acadêmica por meio de um
+sistema de notícias, notificações e feedbacks estudantis. O levantamento de
+requisitos foi realizado utilizando entrevistas semiestruturadas e observação dos
+processos existentes, permitindo a identificação das necessidades dos usuários e a
+definição dos requisitos funcionais e não funcionais do sistema. O projeto prevê
+autenticação integrada ao SUAP, controle de acesso por perfis de usuários, interface
+responsiva e desenvolvimento baseado na arquitetura Model-View-Template (MVT),
+visando garantir maior eficiência, acessibilidade, segurança e organização dos
+processos desenvolvidos pelo NAPNE.
 
 ---
 
