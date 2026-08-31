@@ -29,6 +29,41 @@ processos desenvolvidos pelo NAPNE.
 
 ---
 
+## Como rodar
+
+- Crie uma `venv`:
+```
+python -m venv venv
+```
+
+- Ative a `venv`:
+```
+./venv/Scripts/activate #Windows
+source venv/bin/active  #Linux/Mac
+```
+
+- Instale as dependências:
+```
+pip install -r requirements.txt
+```
+
+- Crie o `.env`:
+```
+cp .env.example .env
+```
+
+- Execute as migrations:
+```
+python manage.py migrate
+```
+
+- Execute o servidor:
+```
+python manage.py runserver
+```
+
+---
+
 ## Tecnologias Utilizadas
 
 [![SkillIcons](https://skillicons.dev/icons?i=py,html,django,bootstrap)](https://skillicons.dev)
