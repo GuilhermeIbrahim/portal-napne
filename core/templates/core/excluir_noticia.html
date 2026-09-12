@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Excluir Notícia - Portal NAPNE</title>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            max-width: 700px;
+            margin: 40px auto;
+            padding: 0 20px;
+            color: #222;
+        }
+        button {
+            padding: 8px 16px;
+            background-color: #b3261e;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 15px;
+        }
+        a { color: #2c6e49; }
+    </style>
+</head>
+<body>
+
+    <h1>Excluir Notícia</h1>
+
+    <p>Tem certeza que deseja excluir a notícia "<strong>{{ noticia.titulo }}</strong>"? Essa ação não pode ser desfeita.</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">Sim, excluir</button>
+        <a href="{% url 'detalhe' noticia.id %}">Cancelar</a>
+    </form>
+
+</body>
+</html>

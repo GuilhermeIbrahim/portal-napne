@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ noticia.titulo }} - Portal NAPNE</title>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            max-width: 700px;
+            margin: 40px auto;
+            padding: 0 20px;
+            color: #222;
+        }
+        a {
+            color: #2c6e49;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+        .data {
+            color: #666;
+            font-size: 0.9em;
+        }
+        .acoes {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #ddd;
+        }
+        .acoes a {
+            margin-right: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <a href="{% url 'index' %}">&larr; Voltar para notícias</a>
+
+    <h1>{{ noticia.titulo }}</h1>
+
+    {% if noticia.imagem %}
+        <img src="{{ noticia.imagem.url }}" alt="{{ noticia.titulo }}">
+    {% endif %}
+
+    <p>{{ noticia.conteudo }}</p>
+    <p class="data">Publicado em: {{ noticia.data }}</p>
+
+    <div class="acoes">
+        <a href="{% url 'editar_noticia' noticia.id %}">Editar</a>
+        <a href="{% url 'excluir_noticia' noticia.id %}">Excluir</a>
+    </div>
+
+</body>
+</html>
