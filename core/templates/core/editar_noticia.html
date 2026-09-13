@@ -1,44 +1,37 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Editar Notícia - Portal NAPNE</title>
-    <style>
-        body {
-            font-family: Arial, Helvetica, sans-serif;
-            max-width: 700px;
-            margin: 40px auto;
-            padding: 0 20px;
-            color: #222;
-        }
-        a { color: #2c6e49; }
-        form p { margin-bottom: 15px; }
-        input[type="text"], textarea {
-            width: 100%;
-            padding: 6px;
-            box-sizing: border-box;
-        }
-        button {
-            padding: 8px 16px;
-            background-color: #2c6e49;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-    </style>
-</head>
-<body>
+{% extends "adminlte/page.html" %}
 
-    <a href="{% url 'detalhe' noticia.id %}">&larr; Voltar para a notícia</a>
+{% block page_title %}Editar Notícia{% endblock %}
 
-    <h1>Editar Notícia</h1>
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{% url 'index' %}">Notícias</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'detalhe' noticia.id %}">{{ noticia.titulo }}</a></li>
+    <li class="breadcrumb-item active">Editar</li>
+{% endblock %}
 
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Salvar alterações</button>
-    </form>
+{% block content %}
 
-</body>
-</html>
+    {% component "adminlte_card" title="Editar notícia" icon="bi bi-pencil-square" theme="warning" %}
+
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            {% component "adminlte_input" field=form.titulo label="Título" %}{% endcomponent %}
+
+            {% if noticia.imagem %}
+                <img src="{{ noticia.imagem.url }}" alt="{{ noticia.titulo }}" class="img-fluid rounded mb-2" style="max-height: 180px;">
+            {% endif %}
+            {% component "adminlte_input_file" field=form.imagem label="Trocar imagem" %}{% endcomponent %}
+
+            {% component "adminlte_textarea" field=form.conteudo label="Conteúdo" rows=6 %}{% endcomponent %}
+
+            <div class="mt-3">
+                <button type="submit" class="btn btn-warning">
+                    <i class="bi bi-check-circle"></i> Salvar alterações
+                </button>
+                <a href="{% url 'detalhe' noticia.id %}" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+
+    {% endcomponent %}
+
+{% endblock %}
