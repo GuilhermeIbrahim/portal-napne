@@ -1,44 +1,31 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Criar Notícia - Portal NAPNE</title>
-    <style>
-        body {
-            font-family: Arial, Helvetica, sans-serif;
-            max-width: 700px;
-            margin: 40px auto;
-            padding: 0 20px;
-            color: #222;
-        }
-        a { color: #2c6e49; }
-        form p { margin-bottom: 15px; }
-        input[type="text"], textarea {
-            width: 100%;
-            padding: 6px;
-            box-sizing: border-box;
-        }
-        button {
-            padding: 8px 16px;
-            background-color: #2c6e49;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-    </style>
-</head>
-<body>
+{% extends "adminlte/page.html" %}
 
-    <a href="{% url 'index' %}">&larr; Voltar para notícias</a>
+{% block page_title %}Criar Notícia{% endblock %}
 
-    <h1>Criar Notícia</h1>
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{% url 'index' %}">Notícias</a></li>
+    <li class="breadcrumb-item active">Criar</li>
+{% endblock %}
 
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Salvar</button>
-    </form>
+{% block content %}
 
-</body>
-</html>
+    {% component "adminlte_card" title="Criar notícia" icon="bi bi-pencil-square" theme="primary" %}
+
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            {% component "adminlte_input" field=form.titulo label="Título" %}{% endcomponent %}
+            {% component "adminlte_input_file" field=form.imagem label="Imagem" %}{% endcomponent %}
+            {% component "adminlte_textarea" field=form.conteudo label="Conteúdo" rows=6 %}{% endcomponent %}
+
+            <div class="mt-3">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check-circle"></i> Salvar
+                </button>
+                <a href="{% url 'index' %}" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+
+    {% endcomponent %}
+
+{% endblock %}

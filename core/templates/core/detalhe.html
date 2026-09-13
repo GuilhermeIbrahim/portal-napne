@@ -1,56 +1,37 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>{{ noticia.titulo }} - Portal NAPNE</title>
-    <style>
-        body {
-            font-family: Arial, Helvetica, sans-serif;
-            max-width: 700px;
-            margin: 40px auto;
-            padding: 0 20px;
-            color: #222;
-        }
-        a {
-            color: #2c6e49;
-        }
-        img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 4px;
-            margin: 15px 0;
-        }
-        .data {
-            color: #666;
-            font-size: 0.9em;
-        }
-        .acoes {
-            margin-top: 20px;
-            padding-top: 15px;
-            border-top: 1px solid #ddd;
-        }
-        .acoes a {
-            margin-right: 15px;
-        }
-    </style>
-</head>
-<body>
+{% extends "adminlte/page.html" %}
 
-    <a href="{% url 'index' %}">&larr; Voltar para notícias</a>
+{% block page_title %}{{ noticia.titulo }}{% endblock %}
 
-    <h1>{{ noticia.titulo }}</h1>
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{% url 'index' %}">Notícias</a></li>
+    <li class="breadcrumb-item active">{{ noticia.titulo }}</li>
+{% endblock %}
 
-    {% if noticia.imagem %}
-        <img src="{{ noticia.imagem.url }}" alt="{{ noticia.titulo }}">
-    {% endif %}
+{% block content %}
 
-    <p>{{ noticia.conteudo }}</p>
-    <p class="data">Publicado em: {{ noticia.data }}</p>
+    {% component "adminlte_card" title=noticia.titulo icon="bi bi-newspaper" theme="primary" %}
 
-    <div class="acoes">
-        <a href="{% url 'editar_noticia' noticia.id %}">Editar</a>
-        <a href="{% url 'excluir_noticia' noticia.id %}">Excluir</a>
-    </div>
+        {% fill "default" %}
+        {% if noticia.imagem %}
+            <img src="{{ noticia.imagem.url }}" alt="{{ noticia.titulo }}" class="img-fluid rounded mb-3">
+        {% endif %}
 
-</body>
-</html>
+        <p>{{ noticia.conteudo|linebreaks }}</p>
+        <p class="text-muted small">Publicado em: {{ noticia.data }}</p>
+
+        {% endfill %}
+        {% fill "footer" %}
+            <a href="{% url 'editar_noticia' noticia.id %}" class="btn btn-sm btn-warning">
+                <i class="bi bi-pencil"></i> Editar
+            </a>
+            <a href="{% url 'excluir_noticia' noticia.id %}" class="btn btn-sm btn-danger">
+                <i class="bi bi-trash"></i> Excluir
+            </a>
+            <a href="{% url 'index' %}" class="btn btn-sm btn-secondary">
+                Voltar
+            </a>
+        {% endfill %}
+
+    {% endcomponent %}
+
+{% endblock %}

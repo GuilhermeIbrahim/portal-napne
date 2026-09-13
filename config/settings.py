@@ -39,6 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'core',
+    
+    'django_adminlte4',
+    'django_components',
 ]
 
 MIDDLEWARE = [
@@ -57,13 +60,23 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [BASE_DIR / "templates"],
-        'APP_DIRS': True,
+        'APP_DIRS': False,
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django_adminlte4.context_processors.adminlte',
             ],
+            'loaders': [(
+                'django.template.loaders.cached.Loader',
+                [
+                    'django.template.loaders.filesystem.Loader',
+                    'django.template.loaders.app_directories.Loader',
+                    'django_components.template_loader.Loader',
+                ],
+            )],
+            'builtins': ['django_components.templatetags.component_tags'],
         },
     },
 ]
@@ -117,8 +130,15 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [
     BASE_DIR / "static",
+]
+
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'django_components.finders.ComponentsFileSystemFinder',
 ]
 
 # Email
@@ -132,3 +152,20 @@ MAILERS = {
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+COMPONENTS = {"dirs": [], "app_dirs": ["components"], "autodiscover": True}
+
+ADMINLTE = {
+    "title": "Portal NAPNE",
+    "title_postfix": "| Portal NAPNE",
+    "logo": "<b>NAPNE</b> Portal",
+    "logo_alt_text": "Portal NAPNE",
+    "sidebar_theme": "dark",
+    "sidebar_mini": True,
+    "assets_mode": "static",
+    "footer_left": "&copy; Portal NAPNE",
+    "menu": [
+        {"text": "Notícias", "route": "index", "icon": "bi bi-newspaper"},
+        {"text": "Nova notícia", "route": "criar_noticia", "icon": "bi bi-plus-circle"},
+    ],
+}
