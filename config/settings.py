@@ -42,6 +42,10 @@ INSTALLED_APPS = [
     
     'django_adminlte4',
     'django_components',
+
+    'crispy_forms',
+    'crispy_bootstrap5',
+    'django_ckeditor_5',
 ]
 
 MIDDLEWARE = [
@@ -168,4 +172,31 @@ ADMINLTE = {
         {"text": "Notícias", "route": "index", "icon": "bi bi-newspaper"},
         {"text": "Nova notícia", "route": "criar_noticia", "icon": "bi bi-plus-circle"},
     ],
+}
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"
+
+CKEDITOR_5_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
+CKEDITOR_5_UPLOAD_FILE_TYPES = ["jpeg", "jpg", "png", "gif", "webp"]
+CKEDITOR_5_MAX_FILE_SIZE = 5 # MB
+
+CKEDITOR_5_CONFIGS = {
+    "default": {
+        "toolbar": [
+            "heading", "|",
+            "bold", "italic", "underline", "|",
+            "bulletedList", "numberedList", "|",
+            "BlockQuote", "link", "|",
+            "insertImage", "mediaEmbed", "|",
+            "undo", "redo",
+        ],
+        "image": {
+            "toolbar": [
+                "imageTextAlternative", "|",
+                "imageStyle:alignLeft", "imageStyle:alignCenter", "imageStyle:alignRight",
+            ],
+            "styles": ["alignLeft", "alignCenter", "alignRight"],
+        },
+    },
 }

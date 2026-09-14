@@ -22,7 +22,7 @@
                     {% if noticia.imagem %}
                         <img src="{{ noticia.imagem.url }}" alt="{{ noticia.titulo }}" class="img-fluid rounded mb-2">
                     {% endif %}
-                    <p class="text-truncate">{{ noticia.conteudo }}</p>
+                    <p class="text-truncate">{{ noticia.conteudo|striptags|truncatewords:20 }}</p>
                     <p class="text-muted small mb-0">Publicado em: {{ noticia.data }}</p>
                     {% endfill %}
                     {% fill "footer" %}
