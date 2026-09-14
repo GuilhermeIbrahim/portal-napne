@@ -16,7 +16,7 @@
             <img src="{{ noticia.imagem.url }}" alt="{{ noticia.titulo }}" class="img-fluid rounded mb-3">
         {% endif %}
 
-        <p>{{ noticia.conteudo|linebreaks }}</p>
+        <p>{{ noticia.conteudo|safe }}</p>
         <p class="text-muted small">Publicado em: {{ noticia.data }}</p>
 
         {% endfill %}
