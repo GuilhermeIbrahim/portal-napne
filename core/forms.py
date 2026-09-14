@@ -12,14 +12,14 @@ class NoticiaForm(forms.ModelForm):
             "titulo": forms.TextInput(attrs={"placeholder": "Título de notícia"}),
         }
 
-        def __init__(self, *args, **kwargs):
-            super().__init__(*args, **kwargs)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
-            self.helper = FormHelper()
-            self.helper.form_tag = False
-            self.helper.layout = Layout(
-                Field("titulo"),
-                Field("imagem"),
-                HTML("<label class='form-label mt-2'>Conteúdo</label>"),
-                Div(Field("conteudo"), css_class="mb-3"),
-            )
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.layout = Layout(
+            Field("titulo"),
+            Field("imagem"),
+            HTML("<label class='form-label mt-2'>Conteúdo</label>"),
+            Div(Field("conteudo"), css_class="mb-3"),
+        )
