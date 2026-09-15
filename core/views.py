@@ -1,8 +1,9 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, redirect, render
+
+from .decorators import napne_required
+from .forms import NoticiaForm
 from .models import Noticia
-from django.shortcuts import get_object_or_404, redirect
-from  .forms import NoticiaForm
-from django.contrib.auth.decorators import login_required
+
 
 def index(request):
     noticias = Noticia.objects.all()
@@ -14,7 +15,7 @@ def detalhe(request, id):
     context = {'noticia': noticia}
     return render(request, "core/detalhe.html", context)
 
-@login_required
+@napne_required
 def criar_noticia(request):
     if request.method == 'POST':
         form = NoticiaForm(request.POST, request.FILES)
@@ -25,7 +26,7 @@ def criar_noticia(request):
         form = NoticiaForm()
     return render(request, 'core/criar_noticia.html', {'form': form})
 
-@login_required
+@napne_required
 def editar_noticia(request, id):
     noticia = get_object_or_404(Noticia, id=id)
     if request.method == 'POST':
@@ -37,7 +38,7 @@ def editar_noticia(request, id):
         form = NoticiaForm(instance=noticia)
     return render(request, 'core/editar_noticia.html', {'form': form, 'noticia': noticia})
 
-@login_required
+@napne_required
 def excluir_noticia(request, id):
     noticia = get_object_or_404(Noticia, id=id)
     if request.method == 'POST':
