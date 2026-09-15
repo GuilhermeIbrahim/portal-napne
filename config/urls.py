@@ -18,9 +18,14 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.views.generic import RedirectView
+from allauth.account.views import LogoutView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('accounts/', include('allauth.urls')),
+    path('accounts/login-alias/', RedirectView.as_view(pattern_name='suap_login', permanent=False), name='login'),
+    path('accounts/logout-alias/', LogoutView.as_view(), name='logout'),
     path('ckeditor5/', include('django_ckeditor_5.urls')),
     path('', include('core.urls')),
 ]

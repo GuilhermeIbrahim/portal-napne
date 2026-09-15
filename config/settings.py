@@ -46,6 +46,11 @@ INSTALLED_APPS = [
     'crispy_forms',
     'crispy_bootstrap5',
     'django_ckeditor_5',
+    
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth_suap',
 ]
 
 MIDDLEWARE = [
@@ -56,6 +61,12 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
+]
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -172,6 +183,7 @@ ADMINLTE = {
         {"text": "Notícias", "route": "index", "icon": "bi bi-newspaper"},
         {"text": "Nova notícia", "route": "criar_noticia", "icon": "bi bi-plus-circle"},
     ],
+    "usermenu_enabled": True,
 }
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
@@ -199,4 +211,25 @@ CKEDITOR_5_CONFIGS = {
             "styles": ["alignLeft", "alignCenter", "alignRight"],
         },
     },
+}
+
+SITE_ID = 1
+
+LOGIN_URL = "/accounts/suap/login/"
+LOGIN_REDIRECT_URL = "index"
+LOGOUT_REDIRECT_URL = "index"
+
+SOCIALACCOUNT_ONLY = True
+ACCOUNT_EMAIL_VERIFICATION = "none"
+SOCIALACCOUNT_LOGIN_ON_GET = True
+
+SOCIALACCOUNT_PROVIDERS = {
+    "suap": {
+        "SUAP_URL":"https://suap.ifrn.edu.br",
+        "SCOPE": ["identificacao", "email"],
+        "APP": {
+            "client_id": config("SUAP_CLIENT_ID"),
+            "secret": config("SUAP_CLIENT_SECRET"),
+        },
+    }
 }
