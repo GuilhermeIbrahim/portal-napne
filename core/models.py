@@ -10,3 +10,10 @@ class Noticia(models.Model):
 
     def __str__(self):
         return self.titulo
+
+class Pei(models.Model):
+    titulo = models.CharField(max_length= 100) 
+    arquivo = models.FileField(upload_to="pei")
+
+    def __str__(self):
+        return self.titulo 
