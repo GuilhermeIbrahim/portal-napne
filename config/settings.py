@@ -183,6 +183,8 @@ ADMINLTE = {
     "menu": [
         {"text": "Notícias", "route": "index", "icon": "bi bi-newspaper"},
         {"text": "Nova notícia", "route": "criar_noticia", "icon": "bi bi-plus-circle"},
+        {"text": "Enviar PEI", "route": "enviar_pei", "icon": "bi bi-upload"},
+        {"text": "Listar PEIs", "route": "listar_peis", "icon": "bi bi-list"},
     ],
     "usermenu_enabled": True,
 }
