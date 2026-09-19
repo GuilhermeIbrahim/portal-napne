@@ -1,0 +1,28 @@
+{% extends "adminlte/page.html" %}
+{% load crispy_forms_tags %}
+
+{% block page_title %}Editar PEI{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{% url 'listar_peis' %}">PEIs recebidos</a></li>
+    <li class="breadcrumb-item active">Editar</li>
+{% endblock %}
+
+{% block content %}
+
+    {% component "adminlte_card" title="Editar PEI" icon="bi bi-pencil-square" theme="primary" %}
+
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% crispy form form.helper %}
+            <div class="mt-3">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check-circle"></i> Salvar alterações
+                </button>
+                <a href="{% url 'detalhar_pei' pei.id %}" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+
+    {% endcomponent %}
+
+{% endblock %}

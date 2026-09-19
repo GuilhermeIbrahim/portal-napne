@@ -1,7 +1,7 @@
 from django import forms
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Field, HTML, Div
-
+from .models import Pei
 from .models import Noticia
 
 class NoticiaForm(forms.ModelForm):
@@ -22,4 +22,23 @@ class NoticiaForm(forms.ModelForm):
             Field("imagem"),
             HTML("<label class='form-label mt-2'>Conteúdo</label>"),
             Div(Field("conteudo"), css_class="mb-3"),
+        )
+
+class PeiForm(forms.ModelForm):
+    class Meta:
+        model = Pei
+        fields = ["titulo", "arquivo"]
+        widgets = {
+            "titulo": forms.TextInput(attrs={"placeholder": "Título do PEI"}),
+            "arquivo": forms.ClearableFileInput(attrs={"accept": ".pdf"}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.layout = Layout(
+            Field("titulo"),
+            Field("arquivo"),
         )

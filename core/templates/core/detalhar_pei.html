@@ -1,0 +1,35 @@
+{% extends "adminlte/page.html" %}
+
+{% block page_title %}{{ pei.titulo }}{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{% url 'listar_peis' %}">PEIs recebidos</a></li>
+    <li class="breadcrumb-item active">{{ pei.titulo }}</li>
+{% endblock %}
+
+{% block content %}
+
+    {% component "adminlte_card" title=pei.titulo icon="bi bi-file-earmark-text" theme="primary" %}
+
+        {% fill "default" %}
+        <p><strong>Professor:</strong> {{ pei.professor.get_full_name|default:pei.professor.username }}</p>
+        <p><strong>Enviado em:</strong> {{ pei.data_envio }}</p>
+        {% endfill %}
+        {% fill "footer" %}
+            <a href="{% url 'baixar_pei' pei.id %}" class="btn btn-sm btn-primary">
+                <i class="bi bi-download"></i> Baixar arquivo
+            </a>
+            <a href="{% url 'editar_pei' pei.id %}" class="btn btn-sm btn-warning">
+                <i class="bi bi-pencil"></i> Editar
+            </a>
+            <a href="{% url 'excluir_pei' pei.id %}" class="btn btn-sm btn-danger">
+                <i class="bi bi-trash"></i> Excluir
+            </a>
+            <a href="{% url 'listar_peis' %}" class="btn btn-sm btn-secondary">
+                Voltar
+            </a>
+        {% endfill %}
+
+    {% endcomponent %}
+
+{% endblock %}
