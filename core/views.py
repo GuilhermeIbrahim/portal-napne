@@ -5,7 +5,6 @@ from .decorators import napne_required
 from .forms import NoticiaForm, PeiForm
 from .models import Noticia, Pei
 
-
 @napne_required
 def painel_home(request):
     context = {'total_noticias': Noticia.objects.count(), 'total_peis': Pei.objects.count(),}
