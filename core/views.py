@@ -1,22 +1,15 @@
+from django.http import FileResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .decorators import napne_required
-from .forms import NoticiaForm
+from .forms import NoticiaForm, PeiForm
 from .models import Noticia, Pei
-from .forms import PeiForm
-from .decorators import professor_required
-from django.http import FileResponse
-from django.contrib import messages
 
-def index(request):
-    noticias = Noticia.objects.all()
-    context = {'noticias': noticias}
-    return render(request, "core/index.html", context)
 
-def detalhe(request, id):
-    noticia = get_object_or_404(Noticia, id=id)
-    context = {'noticia': noticia}
-    return render(request, "core/detalhe.html", context)
+@napne_required
+def painel_home(request):
+    context = {'total_noticias': Noticia.objects.count(), 'total_peis': Pei.objects.count(),}
+    return render(request, "core/painel_home.html", context)
 
 @napne_required
 def criar_noticia(request):
@@ -48,20 +41,6 @@ def excluir_noticia(request, id):
         noticia.delete()
         return redirect('index')
     return render(request, 'core/excluir_noticia.html', {'noticia': noticia})
-
-@professor_required
-def enviar_pei(request):
-    if request.method == 'POST':
-        form = PeiForm(request.POST, request.FILES)
-        if form.is_valid():
-            pei = form.save(commit=False)
-            pei.professor = request.user
-            pei.save()
-            messages.success(request, 'PEI enviado com sucesso!')
-            return redirect('index')
-    else:
-        form = PeiForm()
-    return render(request, 'core/enviar_pei.html', {'form': form})
 
 @napne_required
 def listar_peis(request):

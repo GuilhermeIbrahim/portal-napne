@@ -27,7 +27,8 @@ urlpatterns = [
     path('accounts/login-alias/', RedirectView.as_view(pattern_name='suap_login', permanent=False), name='login'),
     path('accounts/logout-alias/', LogoutView.as_view(), name='logout'),
     path('ckeditor5/', include('django_ckeditor_5.urls')),
-    path('', include('core.urls')),
+    path('painel/', include('core.urls')),
+    path('', include('portal.urls')),
 ]
 
 if settings.DEBUG:
