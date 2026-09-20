@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'core',
+    'portal',
     
     'django_adminlte4',
     'django_components',
@@ -181,10 +182,10 @@ ADMINLTE = {
     "assets_mode": "static",
     "footer_left": "&copy; Portal NAPNE",
     "menu": [
-        {"text": "Notícias", "route": "index", "icon": "bi bi-newspaper"},
+        {"text": "Painel", "route": "painel_home", "icon": "bi bi-speedometer2"},
         {"text": "Nova notícia", "route": "criar_noticia", "icon": "bi bi-plus-circle"},
-        {"text": "Enviar PEI", "route": "enviar_pei", "icon": "bi bi-upload"},
-        {"text": "Listar PEIs", "route": "listar_peis", "icon": "bi bi-list"},
+        {"text": "PEIs recebidos", "route": "listar_peis", "icon": "bi bi-list"},
+        {"text": "Ver site público", "route": "index", "icon": "bi bi-box-arrow-up-right"},
     ],
     "usermenu_enabled": True,
 }
