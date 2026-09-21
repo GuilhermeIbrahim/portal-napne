@@ -9,7 +9,13 @@
         <h1 class="h3 mb-0">Notícias</h1>
     </div>
 
-    <div class="row">
+    <div class="mb-4 position-relative">
+        <input type="text" id="campo-pesquisa" class="form-control" placeholder="Pesquisar notícias..." autocomplete="off">
+
+        <div id="sugestoes-pesquisa" class="list-group position-absolute w-100 shadow-sm d-none" style="z-index: 1000;"></div>
+    </div>
+
+    <div class="row" id="lista-noticias">
         {% for noticia in noticias %}
             <div class="col-md-6 col-lg-4 mb-4">
                 <div class="card h-100 shadow-sm">
@@ -33,4 +39,115 @@
         {% endfor %}
     </div>
 
+    {% if noticias.has_other_pages %}
+    <nav aria-label="Navegação de páginas">
+        <ul class="pagination justify-content-center">
+
+            {% if noticias.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ noticias.previous_page_number }}">Anterior</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">Anterior</span>
+                </li>
+            {% endif %}
+
+            {% for numero_pagina in elided %}
+                {% if numero_pagina == noticias.paginator.ELLIPSIS %}
+                    <li class="page-item disabled">
+                        <span class="page-link">{{ numero_pagina }}</span>
+                    </li>
+                {% elif numero_pagina == noticias.number %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ numero_pagina }}</span>
+                    </li>
+                {% else %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ numero_pagina }}">{{ numero_pagina }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if noticias.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ noticias.next_page_number }}">Próxima</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">Próxima</span>
+                </li>
+            {% endif %}
+
+        </ul>
+    </nav>
+    {% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const campoPesquisa = document.getElementById('campo-pesquisa');
+    const caixaSugestoes = document.getElementById('sugestoes-pesquisa');
+
+    let temporizador = null;
+
+    campoPesquisa.addEventListener('input', function () {
+        const termo = campoPesquisa.value.trim();
+
+        clearTimeout(temporizador);
+
+        if (termo.length === 0) {
+            caixaSugestoes.classList.add('d-none');
+            caixaSugestoes.innerHTML = '';
+            return;
+        }
+
+        temporizador = setTimeout(function () {
+            buscarNoticias(termo);
+        }, 300);
+    });
+
+    function buscarNoticias(termo) {
+        const url = "{% url 'pesquisar_noticias' %}?q=" + encodeURIComponent(termo);
+
+        fetch(url)
+            .then(function (resposta) {
+                return resposta.json();
+            })
+            .then(function (dados) {
+                mostrarSugestoes(dados.resultados);
+            })
+            .catch(function (erro) {
+                console.error('Erro ao pesquisar notícias:', erro);
+            });
+    }
+
+    function mostrarSugestoes(resultados) {
+        caixaSugestoes.innerHTML = '';
+
+        if (resultados.length === 0) {
+            caixaSugestoes.innerHTML = '<div class="list-group-item text-muted">Nenhuma notícia encontrada.</div>';
+            caixaSugestoes.classList.remove('d-none');
+            return;
+        }
+
+        resultados.forEach(function (noticia) {
+            const link = document.createElement('a');
+            link.href = noticia.url;
+            link.className = 'list-group-item list-group-item-action';
+            link.textContent = noticia.titulo;
+            caixaSugestoes.appendChild(link);
+        });
+
+        caixaSugestoes.classList.remove('d-none');
+    }
+
+    document.addEventListener('click', function (evento) {
+        const cliqueForaDaCaixa = !campoPesquisa.contains(evento.target) && !caixaSugestoes.contains(evento.target);
+        if (cliqueForaDaCaixa) {
+            caixaSugestoes.classList.add('d-none');
+        }
+    });
+</script>
 {% endblock %}

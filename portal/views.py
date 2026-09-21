@@ -4,13 +4,20 @@ from django.shortcuts import get_object_or_404, redirect, render
 from core.decorators import professor_required
 from core.forms import PeiForm
 from core.models import Noticia
+from django.core.paginator import Paginator
+from django.db.models import Q
+from django.urls import reverse
+from django.http import JsonResponse
 
 
 def index(request):
     noticias = Noticia.objects.all()
-    context = {'noticias': noticias}
-    return render(request, "portal/index.html", context)
-
+    paginator = Paginator(noticias, 8)  
+    num_pag = request.GET.get('page')
+    page = paginator.get_page(num_pag)
+    elided = paginator.get_elided_page_range(number=page.number, on_each_side=2, on_ends=2)
+    context = {'noticias': page, 'elided': elided}
+    return render(request, "portal/index.html", context) 
 
 def detalhe(request, id):
     noticia = get_object_or_404(Noticia, id=id)
@@ -31,3 +38,16 @@ def enviar_pei(request):
     else:
         form = PeiForm()
     return render(request, 'portal/enviar_pei.html', {'form': form})
+
+def pesquisar_noticias(request):
+    termo = request.GET.get('q', '')
+    resultados = []
+    if termo:
+        noticias = Noticia.objects.filter(Q(titulo__icontains=termo) | Q(conteudo__icontains=termo))
+        for noticia in noticias:
+            resultados.append({
+                'id': noticia.id,
+                'titulo': noticia.titulo,
+                'url': reverse('detalhe', args=[noticia.id]),
+            })
+        return JsonResponse({'resultados': resultados})
