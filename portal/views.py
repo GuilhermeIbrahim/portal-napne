@@ -12,7 +12,7 @@ from django.http import JsonResponse
 
 def index(request):
     noticias = Noticia.objects.all()
-    paginator = Paginator(noticias, 8)  
+    paginator = Paginator(noticias, 9)  
     num_pag = request.GET.get('page')
     page = paginator.get_page(num_pag)
     elided = paginator.get_elided_page_range(number=page.number, on_each_side=2, on_ends=2)
