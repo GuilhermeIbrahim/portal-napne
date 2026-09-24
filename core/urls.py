@@ -12,4 +12,7 @@ urlpatterns = [
     path('excluir_pei/<int:id>/', views.excluir_pei, name='excluir_pei'),
     path('editar_pei/<int:id>/', views.editar_pei, name='editar_pei'),
     path('baixar_pei/<int:id>/', views.baixar_pei, name='baixar_pei'),
+    path('solicitacoes-napne/', views.solicitacoes_napne, name='solicitacoes_napne'),
+    path('solicitacoes-napne/<int:id>/aprovar/', views.aprovar_solicitacao_napne, name='aprovar_solicitacao_napne'),
+    path('solicitacoes-napne/<int:id>/recusar/', views.recusar_solicitacao_napne, name='recusar_solicitacao_napne'),
 ]
