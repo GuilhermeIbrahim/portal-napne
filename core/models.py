@@ -20,3 +20,21 @@ class Pei(models.Model):
 
     def __str__(self):
         return self.titulo 
+    
+class SolicitacaoNapne(models.Model):
+    PENDENTE = "pendente"
+    APROVADO = "aprovado"
+    RECUSADO = "recusado"
+    STATUS_CHOICES = [
+        (PENDENTE, "Pendente"),
+        (APROVADO, "Aprovado"),
+        (RECUSADO, "Recusado"),
+    ]
+    
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="solicitacao_napne")
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=PENDENTE)
+    criado_em = models.DateTimeField(auto_now_add=True)
+    avaliado_por = models.ForeignKey(User, null=True, on_delete=models.SET_NULL, related_name="solicitacoes_napne_avaliadas")
+    
+    def __str__(self):
+        return f"{self.user.get_full_name() or self.user.username} ({self.get_status_display()})"
