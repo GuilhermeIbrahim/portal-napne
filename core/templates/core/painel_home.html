@@ -39,4 +39,20 @@
         </div>
     </div>
 
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            {% component "adminlte_card" title="Solicitações NAPNE" icon="bi bi-person-check" theme="primary" %}
+                {% fill "default" %}
+                    <p class="fs-4 mb-1">{{ total_solicitacoes_pendentes }}</p>
+                    <p class="text-muted mb-0">solicitação(ões) pendente(s)</p>
+                {% endfill %}
+                {% fill "footer" %}
+                    <a href="{% url 'solicitacoes_napne' %}" class="btn btn-sm btn-primary">
+                        <i class="bi bi-person-check"></i> Avaliar solicitações
+                    </a>
+                {% endfill %}
+            {% endcomponent %}
+        </div>
+    </div>
+
 {% endblock %}
