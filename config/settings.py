@@ -241,3 +241,5 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 
 SOCIALACCOUNT_ADAPTER = "core.adapters.SuapSocialAccountAdapter"
+
+AUTH_USER_MODEL = "core.Usuario"

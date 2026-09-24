@@ -1,7 +1,9 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
 
-from .models import Noticia, Pei, SolicitacaoNapne
+from .models import Noticia, Pei, SolicitacaoNapne, Usuario
 
+admin.site.register(Usuario, UserAdmin)
 
 @admin.register(Noticia)
 class NoticiaAdmin(admin.ModelAdmin):
