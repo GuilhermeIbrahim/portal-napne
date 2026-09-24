@@ -1,13 +1,14 @@
 from django.contrib import messages
-from django.shortcuts import get_object_or_404, redirect, render
-
-from core.decorators import professor_required
-from core.forms import PeiForm
-from core.models import Noticia
+from django.contrib.auth import login as auth_login
 from django.core.paginator import Paginator
 from django.db.models import Q
-from django.urls import reverse
 from django.http import JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
+
+from core.decorators import professor_required
+from core.forms import CadastroNapneForm, LoginNapneForm, PeiForm
+from core.models import Noticia, SolicitacaoNapne
 
 
 def index(request):
@@ -51,3 +52,36 @@ def pesquisar_noticias(request):
                 'url': reverse('detalhe', args=[noticia.id]),
             })
         return JsonResponse({'resultados': resultados})
+
+def cadastro_napne(request):
+    if request.user.is_authenticated:
+        return redirect('index')
+
+    if request.method == 'POST':
+        form = CadastroNapneForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            SolicitacaoNapne.objects.create(user=user)
+            auth_login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+            messages.success(
+                request,
+                'Cadastro enviado! Sua conta foi criada e já está logada, mas ainda precisa ser '
+                'aprovada por um membro do NAPNE antes de ter acesso ao painel.',
+            )
+            return redirect('index')
+    else:
+        form = CadastroNapneForm()
+    return render(request, 'portal/cadastro_napne.html', {'form': form})
+
+def login_napne(request):
+    if request.user.is_authenticated:
+        return redirect('index')
+
+    if request.method == 'POST':
+        form = LoginNapneForm(request, data=request.POST)
+        if form.is_valid():
+            auth_login(request, form.get_user())
+            return redirect(request.GET.get('next') or 'index')
+    else:
+        form = LoginNapneForm()
+    return render(request, 'portal/login_napne.html', {'form': form})
