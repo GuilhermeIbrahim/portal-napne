@@ -1,5 +1,7 @@
 from django.contrib import admin
-from .models import Noticia, Pei
+
+from .models import Noticia, Pei, SolicitacaoNapne
+
 
 @admin.register(Noticia)
 class NoticiaAdmin(admin.ModelAdmin):
@@ -12,3 +14,9 @@ class PeiAdmin(admin.ModelAdmin):
     list_display = ('titulo', 'data_envio', 'professor')
     list_filter = ('data_envio', 'professor')
     search_fields = ('titulo',)
+
+@admin.register(SolicitacaoNapne)
+class SolicitacaoNapneAdmin(admin.ModelAdmin):
+    list_display = ('user', 'status', 'criado_em', 'avaliado_por', 'avaliado_em')
+    list_filter = ('status',)
+    search_fields = ('user__username', 'user__first_name', 'user__last_name')
