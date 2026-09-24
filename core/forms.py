@@ -1,6 +1,8 @@
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import HTML, Div, Field, Layout
 from django import forms
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth.models import User
 
 from .models import Noticia, Pei
 
@@ -42,4 +44,39 @@ class PeiForm(forms.ModelForm):
         self.helper.layout = Layout(
             Field("titulo"),
             Field("arquivo"),
+        )
+        
+class CadastroNapneForm(UserCreationForm):
+    first_name = forms.CharField(label="Nome", max_length=150)
+    last_name = forms.CharField(label="Sobrenome", max_length=150)
+    email = forms.EmailField(label="E-mail")
+
+    class Meta:
+        model = User
+        fields = ["username", "first_name", "last_name", "email", "password1", "password2"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.layout = Layout(
+            Field("username"),
+            Field("first_name"),
+            Field("last_name"),
+            Field("email"),
+            Field("password1"),
+            Field("password2"),
+        )
+
+
+class LoginNapneForm(AuthenticationForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.layout = Layout(
+            Field("username"),
+            Field("password"),
         )
