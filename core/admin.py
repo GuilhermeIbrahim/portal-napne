@@ -17,6 +17,6 @@ class PeiAdmin(admin.ModelAdmin):
 
 @admin.register(SolicitacaoNapne)
 class SolicitacaoNapneAdmin(admin.ModelAdmin):
-    list_display = ('user', 'status', 'criado_em', 'avaliado_por', 'avaliado_em')
+    list_display = ('user', 'status', 'criado_em', 'avaliado_por')
     list_filter = ('status',)
     search_fields = ('user__username', 'user__first_name', 'user__last_name')

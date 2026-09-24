@@ -12,7 +12,7 @@ from core.models import Noticia, SolicitacaoNapne
 
 
 def index(request):
-    noticias = Noticia.objects.all()
+    noticias = Noticia.objects.all().order_by('-data')
     paginator = Paginator(noticias, 9)  
     num_pag = request.GET.get('page')
     page = paginator.get_page(num_pag)
