@@ -1,13 +1,21 @@
+from django.contrib import messages
+from django.contrib.auth.models import Group
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 
 from .decorators import napne_required
 from .forms import NoticiaForm, PeiForm
-from .models import Noticia, Pei
+from .models import Noticia, Pei, SolicitacaoNapne
+
 
 @napne_required
 def painel_home(request):
-    context = {'total_noticias': Noticia.objects.count(), 'total_peis': Pei.objects.count(),}
+    context = {
+        'total_noticias': Noticia.objects.count(),
+        'total_peis': Pei.objects.count(),
+        'total_solicitacoes_pendentes': SolicitacaoNapne.objects.filter(status=SolicitacaoNapne.PENDENTE).count(),
+    }
     return render(request, "core/painel_home.html", context)
 
 @napne_required
@@ -79,3 +87,32 @@ def baixar_pei(request, id):
     response = FileResponse(pei.arquivo.open(), as_attachment=True, filename=pei.arquivo.name)
     response['Content-disposition'] = f'attachment; filename="{pei.arquivo.name}"'
     return response
+
+@napne_required
+def solicitacoes_napne(request):
+    solicitacoes = SolicitacaoNapne.objects.filter(status=SolicitacaoNapne.PENDENTE).select_related('user')
+    return render(request, 'core/solicitacoes_napne.html', {'solicitacoes': solicitacoes})
+
+@napne_required
+def aprovar_solicitacao_napne(request, id):
+    solicitacao = get_object_or_404(SolicitacaoNapne, id=id)
+    if request.method == 'POST':
+        grupo_napne, _ = Group.objects.get_or_create(name="NAPNE")
+        solicitacao.user.groups.add(grupo_napne)
+        solicitacao.status = SolicitacaoNapne.APROVADO
+        solicitacao.avaliado_por = request.user
+        solicitacao.avaliado_em = timezone.now()
+        solicitacao.save()
+        messages.success(request, f'{solicitacao.user.get_full_name()} foi aprovado(a) como membro do NAPNE.')
+    return redirect('solicitacoes_napne')
+
+@napne_required
+def recusar_solicitacao_napne(request, id):
+    solicitacao = get_object_or_404(SolicitacaoNapne, id=id)
+    if request.method == 'POST':
+        solicitacao.status = SolicitacaoNapne.RECUSADO
+        solicitacao.avaliado_por = request.user
+        solicitacao.avaliado_em = timezone.now()
+        solicitacao.save()
+        messages.info(request, f'A solicitação de {solicitacao.user.get_full_name()} foi recusada.')
+    return redirect('solicitacoes_napne')
