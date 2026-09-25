@@ -182,10 +182,11 @@ ADMINLTE = {
     "assets_mode": "static",
     "footer_left": "&copy; Portal NAPNE",
     "menu": [
-        {"text": "Painel", "route": "painel_home", "icon": "bi bi-speedometer2"},
-        {"text": "Nova notícia", "route": "criar_noticia", "icon": "bi bi-plus-circle"},
-        {"text": "PEIs recebidos", "route": "listar_peis", "icon": "bi bi-list"},
-        {"text": "Ver site público", "route": "index", "icon": "bi bi-box-arrow-up-right"},
+    {"text": "Painel", "route": "painel_home", "icon": "bi bi-speedometer2"},
+    {"text": "Nova notícia", "route": "criar_noticia", "icon": "bi bi-plus-circle"},
+    {"text": "PEIs recebidos", "route": "listar_peis", "icon": "bi bi-list"},
+    {"text": "Solicitações NAPNE", "route": "solicitacoes_napne", "icon": "bi bi-person-check"},
+    {"text": "Ver site público", "route": "index", "icon": "bi bi-box-arrow-up-right"},
     ],
     "usermenu_enabled": True,
 }
@@ -240,3 +241,5 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 
 SOCIALACCOUNT_ADAPTER = "core.adapters.SuapSocialAccountAdapter"
+
+AUTH_USER_MODEL = "core.Usuario"
