@@ -98,10 +98,10 @@ class ApresentacaoNapneForm(forms.ModelForm):
             Div(Field("conteudo"), css_class="mb-3"),
         )
     
-    ImagemCarrosselFormSet = inlineformset_factory(
+ImagemCarrosselFormSet = inlineformset_factory(
         ApresentacaoNapne,
         ImagemCarrossel,
         fields=["imagem", "legenda", "ordem"],
         extra=3,
         can_delete=True,
-    )
+)
