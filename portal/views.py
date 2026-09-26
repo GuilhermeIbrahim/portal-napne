@@ -183,3 +183,25 @@ def editar_feedback_privado(request, feedback_id):
         form = FeedbackPrivadoForm(instance=feedback)
 
     return render(request, 'portal/editar_feedback_privado.html', {'form': form, 'feedback': feedback})
+
+def detalhar_feedback_privado(request, feedback_id):
+    feedback = get_object_or_404(FeedbackPrivado, id=feedback_id)
+    eh_autor = request.user == feedback.autor
+    eh_napne = request.user.groups.filter(name="NAPNE").exists()
+
+    if not (eh_autor or eh_napne):
+        messages.error(request, 'Você não tem permissão para visualizar este feedback privado.')
+        return redirect('index')
+
+    return render(request, 'portal/detalhar_feedback_privado.html', {'feedback': feedback})
+
+def detalhar_feedback_publico(request, feedback_id):
+    feedback = get_object_or_404(FeedbackPublico, id=feedback_id)
+    eh_autor = request.user == feedback.autor
+    eh_napne = request.user.groups.filter(name="NAPNE").exists()
+
+    if not (eh_autor or eh_napne):
+        messages.error(request, 'Você não tem permissão para visualizar este comentário.')
+        return redirect('index')
+
+    return render(request, 'portal/detalhar_feedback_publico.html', {'feedback': feedback})

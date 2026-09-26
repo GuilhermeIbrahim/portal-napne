@@ -14,4 +14,6 @@ urlpatterns = [
     path('excluir-feedback-publico/<int:feedback_id>/', views.excluir_feedback_publico, name='excluir_feedback_publico'),
     path('editar-feedback-publico/<int:feedback_id>/', views.editar_feedback_publico, name='editar_feedback_publico'),
     path('editar-feedback-privado/<int:feedback_id>/', views.editar_feedback_privado, name='editar_feedback_privado'),
+    path('detalhar-feedback-privado/<int:feedback_id>/', views.detalhar_feedback_privado, name='detalhar_feedback_privado'),
+    path('detalhar-feedback-publico/<int:feedback_id>/', views.detalhar_feedback_publico, name='detalhar_feedback_publico'),
 ]
