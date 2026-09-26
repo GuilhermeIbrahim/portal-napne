@@ -2,13 +2,22 @@ from django.contrib import messages
 from django.contrib.auth import login as auth_login
 from django.core.paginator import Paginator
 from django.db.models import Q
+<<<<<<< HEAD
 from django.http import JsonResponse, request
+=======
+from django.http import JsonResponse
+>>>>>>> c21c7da6615de4faf12ec6f9a9e962b187ad9d58
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
 from core.decorators import professor_required
+<<<<<<< HEAD
 from core.forms import CadastroNapneForm, LoginNapneForm, PeiForm, FeedbackPublicoForm, FeedbackPrivadoForm
 from core.models import FeedbackPublico, Noticia, SolicitacaoNapne
+=======
+from core.forms import CadastroNapneForm, LoginNapneForm, PeiForm
+from core.models import Noticia, SolicitacaoNapne
+>>>>>>> c21c7da6615de4faf12ec6f9a9e962b187ad9d58
 
 
 def index(request):
@@ -85,6 +94,7 @@ def login_napne(request):
     else:
         form = LoginNapneForm()
     return render(request, 'portal/login_napne.html', {'form': form})
+<<<<<<< HEAD
 
 def fazer_feedback_publico(request, noticia_id):
     noticia = get_object_or_404(Noticia, id=noticia_id)
@@ -136,3 +146,5 @@ def excluir_feedback_publico(request, feedback_id):
         messages.error(request, 'Você não tem permissão para excluir este comentário.')
         
     return redirect('detalhe', id=feedback.noticia.id)
+=======
+>>>>>>> c21c7da6615de4faf12ec6f9a9e962b187ad9d58

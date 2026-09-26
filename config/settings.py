@@ -186,7 +186,10 @@ ADMINLTE = {
     {"text": "Nova notícia", "route": "criar_noticia", "icon": "bi bi-plus-circle"},
     {"text": "PEIs recebidos", "route": "listar_peis", "icon": "bi bi-list"},
     {"text": "Solicitações NAPNE", "route": "solicitacoes_napne", "icon": "bi bi-person-check"},
+<<<<<<< HEAD
     {"text": "Feedbacks privados", "route": "listar_feedbacks_privados", "icon": "bi bi-chat-left-text"},
+=======
+>>>>>>> c21c7da6615de4faf12ec6f9a9e962b187ad9d58
     {"text": "Ver site público", "route": "index", "icon": "bi bi-box-arrow-up-right"},
     ],
     "usermenu_enabled": True,

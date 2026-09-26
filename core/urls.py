@@ -15,5 +15,8 @@ urlpatterns = [
     path('solicitacoes-napne/', views.solicitacoes_napne, name='solicitacoes_napne'),
     path('solicitacoes-napne/<int:id>/aprovar/', views.aprovar_solicitacao_napne, name='aprovar_solicitacao_napne'),
     path('solicitacoes-napne/<int:id>/recusar/', views.recusar_solicitacao_napne, name='recusar_solicitacao_napne'),
+<<<<<<< HEAD
     path('listar_feedbacks_privados/', views.listar_feedbacks_privados, name='listar_feedbacks_privados'),
+=======
+>>>>>>> c21c7da6615de4faf12ec6f9a9e962b187ad9d58
 ]
