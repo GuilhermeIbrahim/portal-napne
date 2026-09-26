@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from .models import Noticia, Pei, SolicitacaoNapne, Usuario
+from .models import Noticia, Pei, SolicitacaoNapne, Usuario, FeedbackPublico, FeedbackPrivado
 
 admin.site.register(Usuario, UserAdmin)
 
@@ -22,3 +22,15 @@ class SolicitacaoNapneAdmin(admin.ModelAdmin):
     list_display = ('user', 'status', 'criado_em', 'avaliado_por')
     list_filter = ('status',)
     search_fields = ('user__username', 'user__first_name', 'user__last_name')
+
+@admin.register(FeedbackPublico)
+class FeedbackPublicoAdmin(admin.ModelAdmin):
+    list_display = ('noticia', 'autor', 'data')
+    list_filter = ('data',)
+    search_fields = ('noticia__titulo', 'autor__username', 'autor__first_name', 'autor__last_name')
+    
+@admin.register(FeedbackPrivado)
+class FeedbackPrivadoAdmin(admin.ModelAdmin):
+    list_display = ('noticia', 'autor', 'data')
+    list_filter = ('data',)
+    search_fields = ('noticia__titulo', 'autor__username', 'autor__first_name', 'autor__last_name')
