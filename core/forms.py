@@ -4,11 +4,7 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 
-<<<<<<< HEAD
 from .models import Noticia, Pei, FeedbackPublico, FeedbackPrivado
-=======
-from .models import Noticia, Pei
->>>>>>> c21c7da6615de4faf12ec6f9a9e962b187ad9d58
 
 
 class NoticiaForm(forms.ModelForm):
@@ -83,7 +79,6 @@ class LoginNapneForm(AuthenticationForm):
         self.helper.layout = Layout(
             Field("username"),
             Field("password"),
-<<<<<<< HEAD
         )
 
 class FeedbackPublicoForm(forms.ModelForm):
@@ -102,6 +97,3 @@ class FeedbackPrivadoForm(forms.ModelForm):
         widgets = {
             "conteudo": forms.Textarea(attrs={"placeholder": "Escreva seu feedback aqui...", "rows": 3}),
         }
-=======
-        )
->>>>>>> c21c7da6615de4faf12ec6f9a9e962b187ad9d58

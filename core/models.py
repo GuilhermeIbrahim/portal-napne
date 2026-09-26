@@ -41,7 +41,6 @@ class SolicitacaoNapne(models.Model):
     avaliado_por = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL, related_name="solicitacoes_napne_avaliadas")
     
     def __str__(self):
-<<<<<<< HEAD
         return f"{self.user.get_full_name() or self.user.username} ({self.get_status_display()})"
 
 
@@ -62,6 +61,3 @@ class FeedbackPrivado(models.Model):
 
     def __str__(self):
         return f"Feedback privado de {self.autor}"
-=======
-        return f"{self.user.get_full_name() or self.user.username} ({self.get_status_display()})"
->>>>>>> c21c7da6615de4faf12ec6f9a9e962b187ad9d58
