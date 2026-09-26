@@ -15,4 +15,5 @@ urlpatterns = [
     path('solicitacoes-napne/', views.solicitacoes_napne, name='solicitacoes_napne'),
     path('solicitacoes-napne/<int:id>/aprovar/', views.aprovar_solicitacao_napne, name='aprovar_solicitacao_napne'),
     path('solicitacoes-napne/<int:id>/recusar/', views.recusar_solicitacao_napne, name='recusar_solicitacao_napne'),
+    path('apresentacao/editar/', views.editar_apresentacao_napne, name='editar_apresentacao_napne'),
 ]
