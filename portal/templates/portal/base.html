@@ -22,6 +22,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'index' %}">Notícias</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'apresentacao_napne' %}">Sobre o NAPNE</a>
+                    </li>
                     {% if request.user.is_authenticated %}
                         {% if request.user|has_group:"Servidor" %}
                             <li class="nav-item">
