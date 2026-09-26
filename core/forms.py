@@ -4,7 +4,7 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 
-from .models import Noticia, Pei
+from .models import Noticia, Pei, FeedbackPublico, FeedbackPrivado
 
 
 class NoticiaForm(forms.ModelForm):
@@ -80,3 +80,20 @@ class LoginNapneForm(AuthenticationForm):
             Field("username"),
             Field("password"),
         )
+
+class FeedbackPublicoForm(forms.ModelForm):
+    class Meta:
+        model = FeedbackPublico
+        fields = ["conteudo"]
+        widgets = {
+            "conteudo": forms.Textarea(attrs={"placeholder": "Escreva seu comentário aqui...", "rows": 3}),
+        }
+
+class FeedbackPrivadoForm(forms.ModelForm):  
+    noticia = forms.ModelChoiceField(queryset=Noticia.objects.all(), widget=forms.HiddenInput(), required=False)
+    class Meta:
+        model = FeedbackPrivado
+        fields = ["noticia", "conteudo"]
+        widgets = {
+            "conteudo": forms.Textarea(attrs={"placeholder": "Escreva seu feedback aqui...", "rows": 3}),
+        }
