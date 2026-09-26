@@ -53,18 +53,28 @@
                     <p class="mb-1">{{ comentario.conteudo }}</p>
                     <small class="text-muted">
                         {{ comentario.autor.get_full_name|default:comentario.autor.username }} — {{ comentario.data }}
+                        {% if comentario.editado_em %}
+                            <span class="fst-italic">(editado em {{ comentario.editado_em }})</span>
+                        {% endif %}
                     </small>
                 </div>
-                {% if request.user == comentario.autor or request.user|has_group:"NAPNE" %}
-                    <form method="post" action="{% url 'excluir_feedback_publico' comentario.id %}"
-                          onsubmit="return confirm('Tem certeza que deseja excluir este comentário?');">
-                        {% csrf_token %}
-                        <input type="hidden" name="confirmacao" value="sim">
-                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Excluir comentário">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </form>
-                {% endif %}
+                <div class="d-flex gap-1">
+                    {% if request.user == comentario.autor %}
+                        <a href="{% url 'editar_feedback_publico' comentario.id %}" class="btn btn-sm btn-outline-warning" title="Editar comentário">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                    {% endif %}
+                    {% if request.user == comentario.autor or request.user|has_group:"NAPNE" %}
+                        <form method="post" action="{% url 'excluir_feedback_publico' comentario.id %}"
+                              onsubmit="return confirm('Tem certeza que deseja excluir este comentário?');">
+                            {% csrf_token %}
+                            <input type="hidden" name="confirmacao" value="sim">
+                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Excluir comentário">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                    {% endif %}
+                </div>
             </div>
         {% empty %}
             <p class="text-muted">Nenhum comentário ainda. Seja a primeira pessoa a comentar!</p>

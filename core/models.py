@@ -46,8 +46,9 @@ class SolicitacaoNapne(models.Model):
 
 class FeedbackPublico(models.Model):
     noticia = models.ForeignKey(Noticia, on_delete=models.CASCADE, related_name='comentarios')
-    conteudo = models.TextField(max_length = 200)
+    conteudo = models.TextField(max_length = 500)
     data = models.DateField(auto_now_add = True)
+    editado_em =models.DateTimeField(blank=True, null=True)
     autor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     def __str__(self):
@@ -55,8 +56,9 @@ class FeedbackPublico(models.Model):
 
 class FeedbackPrivado(models.Model):
     noticia = models.ForeignKey(Noticia, on_delete=models.SET_NULL, null=True, blank=True, related_name='feedbacks_privados')
-    conteudo = models.TextField(max_length=200)
+    conteudo = models.TextField(max_length=500)
     data = models.DateField(auto_now_add=True)
+    editado_em =models.DateTimeField(blank=True, null=True)
     autor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     def __str__(self):

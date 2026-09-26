@@ -11,5 +11,7 @@ urlpatterns = [
     path('napne/login/', views.login_napne, name='login_napne'),
     path('feedback-publico/<int:noticia_id>/', views.fazer_feedback_publico, name='fazer_feedback_publico'),
     path('feedback-privado/', views.fazer_feedback_privado, name='fazer_feedback_privado'),
-    path('excluir-feedback-publico/<int:feedback_id>/', views.excluir_feedback_publico, name='excluir_feedback_publico')
+    path('excluir-feedback-publico/<int:feedback_id>/', views.excluir_feedback_publico, name='excluir_feedback_publico'),
+    path('editar-feedback-publico/<int:feedback_id>/', views.editar_feedback_publico, name='editar_feedback_publico'),
+    path('editar-feedback-privado/<int:feedback_id>/', views.editar_feedback_privado, name='editar_feedback_privado'),
 ]

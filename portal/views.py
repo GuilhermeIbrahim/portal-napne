@@ -5,10 +5,11 @@ from django.db.models import Q
 from django.http import JsonResponse, request
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils import timezone
 
 from core.decorators import professor_required
 from core.forms import CadastroNapneForm, LoginNapneForm, PeiForm, FeedbackPublicoForm, FeedbackPrivadoForm
-from core.models import Noticia, SolicitacaoNapne
+from core.models import FeedbackPrivado, FeedbackPublico, Noticia, SolicitacaoNapne
 
 
 
@@ -105,6 +106,7 @@ def fazer_feedback_publico(request, noticia_id):
 def fazer_feedback_privado(request,):
     noticia = request.GET.get('noticia')
     noticia_vinculada = Noticia.objects.filter(id=noticia).first() if noticia else None
+    meus_feedbacks = FeedbackPrivado.objects.filter(autor=request.user).order_by('-data')
     if request.method == 'POST':
         form = FeedbackPrivadoForm(request.POST)
         if form.is_valid():
@@ -118,7 +120,7 @@ def fazer_feedback_privado(request,):
     else:
         form = FeedbackPrivadoForm(initial={'noticia': noticia})
 
-    return render(request, 'portal/fazer_feedback_privado.html', {'form': form, 'noticia_vinculada': noticia_vinculada})
+    return render(request, 'portal/fazer_feedback_privado.html', {'form': form, 'noticia_vinculada': noticia_vinculada, 'meus_feedbacks': meus_feedbacks})
 
 
 def excluir_feedback_publico(request, feedback_id):
@@ -138,3 +140,46 @@ def excluir_feedback_publico(request, feedback_id):
         
     return redirect('detalhe', id=feedback.noticia.id)
 
+
+def editar_feedback_publico(request, feedback_id):
+    feedback = get_object_or_404(FeedbackPublico, id=feedback_id)
+    eh_autor = request.user == feedback.autor
+
+    if not eh_autor:
+        messages.error(request, 'Você não tem permissão para editar este comentário.')
+        return redirect('detalhe', id=feedback.noticia.id)
+
+    if request.method == 'POST':
+        form = FeedbackPublicoForm(request.POST, instance=feedback)
+        if form.is_valid():
+            feedback = form.save(commit=False)
+            feedback.editado_em = timezone.now()
+            form.save()
+            messages.success(request, 'Comentário editado com sucesso!')
+            return redirect('detalhe', id=feedback.noticia.id)
+    else:
+        form = FeedbackPublicoForm(instance=feedback)
+
+    return render(request, 'portal/editar_feedback_publico.html', {'form': form, 'feedback': feedback})
+
+
+def editar_feedback_privado(request, feedback_id):
+    feedback = get_object_or_404(FeedbackPrivado, id=feedback_id)
+    eh_autor = request.user == feedback.autor
+
+    if not eh_autor:
+        messages.error(request, 'Você não tem permissão para editar este feedback privado.')
+        return redirect('index')
+
+    if request.method == 'POST':
+        form = FeedbackPrivadoForm(request.POST, instance=feedback)
+        if form.is_valid():
+            feedback = form.save(commit=False)
+            feedback.editado_em = timezone.now()
+            form.save()
+            messages.success(request, 'Feedback privado editado com sucesso!')
+            return redirect('index')
+    else:
+        form = FeedbackPrivadoForm(instance=feedback)
+
+    return render(request, 'portal/editar_feedback_privado.html', {'form': form, 'feedback': feedback})

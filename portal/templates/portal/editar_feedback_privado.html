@@ -1,0 +1,37 @@
+{% extends "portal/base.html" %}
+
+{% block title %}Editar feedback | Portal NAPNE{% endblock %}
+
+{% block content %}
+
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'index' %}">Notícias</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'fazer_feedback_privado' %}">Feedback privado</a></li>
+            <li class="breadcrumb-item active">Editar feedback</li>
+        </ol>
+    </nav>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h1 class="h4 mb-2">Editar feedback privado</h1>
+            <p class="text-muted small">
+                Essa mensagem é vista apenas pela equipe do NAPNE.
+                {% if feedback.noticia %}
+                    Ela está vinculada à notícia "<strong>{{ feedback.noticia.titulo }}</strong>".
+                {% endif %}
+            </p>
+            {% if feedback.editado_em %}
+                <p class="text-muted small">Editado pela última vez em {{ feedback.editado_em }}.</p>
+            {% endif %}
+
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-primary">Salvar alterações</button>
+                <a href="{% url 'fazer_feedback_privado' %}" class="btn btn-secondary">Cancelar</a>
+            </form>
+        </div>
+    </div>
+
+{% endblock %}

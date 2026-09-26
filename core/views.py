@@ -122,3 +122,4 @@ def listar_feedbacks_privados(request):
     feedbacks = FeedbackPrivado.objects.select_related('autor', 'noticia').order_by('-data')
     context = {'feedbacks': feedbacks}
     return render(request, 'core/listar_feedbacks_privados.html', context)
+
