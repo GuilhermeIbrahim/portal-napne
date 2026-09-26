@@ -1,0 +1,46 @@
+{% extends "adminlte/page.html" %}
+{% load crispy_forms_tags %}
+
+{% block page_title %}Apresentação do NAPNE{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{% url 'painel_home' %}">Painel</a></li>
+    <li class="breadcrumb-item active">Apresentação do NAPNE</li>
+{% endblock %}
+
+{% block content %}
+
+    {% component "adminlte_card" title="Editar apresentação do NAPNE" icon="bi bi-easel" theme="primary" %}
+
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% crispy form form.helper %}
+
+            <hr>
+            <h5>Imagens do carrossel</h5>
+            <p class="text-muted small">
+                Para remover uma imagem já existente, marque "Excluir" nela e salve.
+                Para adicionar, escolha um arquivo em um dos campos de imagem vazios abaixo.
+            </p>
+
+            {{ formset.management_form }}
+            {% for subform in formset %}
+                <div class="border rounded p-3 mb-3">
+                    {% if subform.instance.imagem %}
+                        <img src="{{ subform.instance.imagem.url }}" class="img-fluid rounded mb-2" style="max-height: 140px;">
+                    {% endif %}
+                    {{ subform|crispy }}
+                </div>
+            {% endfor %}
+
+            <div class="mt-3">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check-circle"></i> Salvar
+                </button>
+                <a href="{% url 'apresentacao_napne' %}" class="btn btn-secondary">Ver página pública</a>
+            </div>
+        </form>
+
+    {% endcomponent %}
+
+{% endblock %}
