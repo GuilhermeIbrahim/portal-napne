@@ -23,6 +23,11 @@
                         <a class="nav-link" href="{% url 'index' %}">Notícias</a>
                     </li>
                     {% if request.user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'fazer_feedback_privado' %}">
+                                <i class="bi bi-envelope"></i> Feedback privado
+                            </a>
+                        </li>
                         {% if request.user|has_group:"Servidor" %}
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url 'enviar_pei' %}">

@@ -35,4 +35,40 @@
 
     <a href="{% url 'index' %}" class="btn btn-link mt-3 ps-0">&laquo; Voltar para notícias</a>
 
+    <div class="d-flex gap-2 mt-3 mb-4">
+        <a href="{% url 'fazer_feedback_publico' noticia.id %}" class="btn btn-outline-primary btn-sm">
+            <i class="bi bi-chat-dots"></i> Comentar
+        </a>
+        <a href="{% url 'fazer_feedback_privado' %}?noticia={{ noticia.id }}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-envelope"></i> Enviar feedback privado ao NAPNE
+        </a>
+    </div>
+
+    <section>
+        <h2 class="h5">Comentários ({{ noticia.comentarios.count }})</h2>
+
+        {% for comentario in noticia.comentarios.all %}
+            <div class="border-bottom py-2 d-flex justify-content-between align-items-start">
+                <div>
+                    <p class="mb-1">{{ comentario.conteudo }}</p>
+                    <small class="text-muted">
+                        {{ comentario.autor.get_full_name|default:comentario.autor.username }} — {{ comentario.data }}
+                    </small>
+                </div>
+                {% if request.user == comentario.autor or request.user|has_group:"NAPNE" %}
+                    <form method="post" action="{% url 'excluir_feedback_publico' comentario.id %}"
+                          onsubmit="return confirm('Tem certeza que deseja excluir este comentário?');">
+                        {% csrf_token %}
+                        <input type="hidden" name="confirmacao" value="sim">
+                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Excluir comentário">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </form>
+                {% endif %}
+            </div>
+        {% empty %}
+            <p class="text-muted">Nenhum comentário ainda. Seja a primeira pessoa a comentar!</p>
+        {% endfor %}
+    </section>
+
 {% endblock %}

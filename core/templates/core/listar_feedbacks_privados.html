@@ -1,0 +1,48 @@
+{% extends "adminlte/page.html" %}
+
+{% block page_title %}Feedbacks privados{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item active">Feedbacks privados</li>
+{% endblock %}
+
+{% block content %}
+
+    {% component "adminlte_card" title="Feedbacks privados" icon="bi bi-chat-square-text" theme="primary" %}
+
+        {% if feedbacks %}
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>Autor</th>
+                    <th>Notícia vinculada</th>
+                    <th>Conteúdo</th>
+                    <th>Data</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for feedback in feedbacks %}
+                <tr>
+                    <td>{{ feedback.autor.get_full_name|default:feedback.autor.username }}</td>
+                    <td>
+                        {% if feedback.noticia %}
+                            <a href="{% url 'detalhe' feedback.noticia.id %}">{{ feedback.noticia.titulo }}</a>
+                        {% else %}
+                            <span class="text-muted">—</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ feedback.conteudo }}</td>
+                    <td>{{ feedback.data }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+            {% component "adminlte_callout" theme="info" title="Nenhum feedback" %}
+                Nenhum feedback privado foi enviado ainda.
+            {% endcomponent %}
+        {% endif %}
+
+    {% endcomponent %}
+
+{% endblock %}
