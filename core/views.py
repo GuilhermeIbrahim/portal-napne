@@ -6,7 +6,7 @@ from django.utils import timezone
 
 from .decorators import napne_required
 from .forms import NoticiaForm, PeiForm
-from .models import Noticia, Pei, SolicitacaoNapne
+from .models import FeedbackPrivado, Noticia, Pei, SolicitacaoNapne
 
 
 @napne_required
@@ -116,3 +116,9 @@ def recusar_solicitacao_napne(request, id):
         solicitacao.save()
         messages.info(request, f'A solicitação de {solicitacao.user.get_full_name()} foi recusada.')
     return redirect('solicitacoes_napne')
+
+@napne_required
+def listar_feedbacks_privados(request):
+    feedbacks = FeedbackPrivado.objects.select_related('autor', 'noticia').order_by('-data')
+    context = {'feedbacks': feedbacks}
+    return render(request, 'core/listar_feedbacks_privados.html', context)
