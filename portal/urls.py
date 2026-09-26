@@ -9,4 +9,5 @@ urlpatterns = [
     path('pesquisar_noticias/', views.pesquisar_noticias, name='pesquisar_noticias'),
     path('napne/cadastro/', views.cadastro_napne, name='cadastro_napne'),
     path('napne/login/', views.login_napne, name='login_napne'),
+    path('sobre/', views.apresentacao_napne, name='apresentacao_napne'),
 ]

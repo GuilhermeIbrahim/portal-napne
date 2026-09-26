@@ -42,3 +42,30 @@ class SolicitacaoNapne(models.Model):
     
     def __str__(self):
         return f"{self.user.get_full_name() or self.user.username} ({self.get_status_display()})"
+    
+class ApresentacaoNapne(models.Model):
+    titulo = models.CharField(max_length=200, default="Conheça o NAPNE")
+    conteudo = CKEditor5Field("Conteúdo", config_name="default", default="", blank=True)
+    atualizado_em = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return self.titulo
+    
+    @classmethod
+    def obter_instancia(cls):
+        apresentacao = cls.objects.first()
+        if apresentacao is None:
+            apresentacao = cls.objects.create()
+        return apresentacao
+    
+class ImagemCarrossel(models.Model):
+    apresentacao = models.ForeignKey(ApresentacaoNapne, on_delete=models.CASCADE, related_name="imagens")
+    imagem = models.ImageField(upload_to="apresentacao_napne")
+    legenda = models.CharField(max_length=200, blank=True)
+    ordem = models.PositiveIntegerField(default=0)
+    
+    class Meta:
+        ordering = ["ordem", "id"]
+    
+    def __str__(self):
+        return self.legenda or f"imagem #{self.pk}"

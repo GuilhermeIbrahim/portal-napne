@@ -3,8 +3,9 @@ from crispy_forms.layout import HTML, Div, Field, Layout
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.forms import inlineformset_factory
 
-from .models import Noticia, Pei
+from .models import ApresentacaoNapne, ImagemCarrossel, Noticia, Pei
 
 
 class NoticiaForm(forms.ModelForm):
@@ -80,3 +81,27 @@ class LoginNapneForm(AuthenticationForm):
             Field("username"),
             Field("password"),
         )
+        
+class ApresentacaoNapneForm(forms.ModelForm):
+    class Meta:
+        model = ApresentacaoNapne
+        fields = ["titulo", "conteudo"]
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.layout = Layout(
+            Field("titulo"),
+            HTML("<label class='form-label mt-2'>Conteúdo</label>"),
+            Div(Field("conteudo"), css_class="mb-3"),
+        )
+    
+ImagemCarrosselFormSet = inlineformset_factory(
+        ApresentacaoNapne,
+        ImagemCarrossel,
+        fields=["imagem", "legenda", "ordem"],
+        extra=3,
+        can_delete=True,
+)

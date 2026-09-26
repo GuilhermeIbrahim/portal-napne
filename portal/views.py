@@ -8,7 +8,7 @@ from django.urls import reverse
 
 from core.decorators import professor_required
 from core.forms import CadastroNapneForm, LoginNapneForm, PeiForm
-from core.models import Noticia, SolicitacaoNapne
+from core.models import ApresentacaoNapne, Noticia, SolicitacaoNapne
 
 
 def index(request):
@@ -85,3 +85,8 @@ def login_napne(request):
     else:
         form = LoginNapneForm()
     return render(request, 'portal/login_napne.html', {'form': form})
+
+def apresentacao_napne(request):
+    apresentacao = ApresentacaoNapne.obter_instancia()
+    context = {'apresentacao': apresentacao}
+    return render(request, 'portal/apresentacao_napne.html', context)
