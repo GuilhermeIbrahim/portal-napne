@@ -1,0 +1,28 @@
+{% extends "portal/base.html" %}
+
+{% block title %}Comentar | Portal NAPNE{% endblock %}
+
+{% block content %}
+
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'index' %}">Notícias</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'detalhe' noticia.id %}">{{ noticia.titulo }}</a></li>
+            <li class="breadcrumb-item active">Comentar</li>
+        </ol>
+    </nav>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h1 class="h4 mb-3">Comentar em "{{ noticia.titulo }}"</h1>
+
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-primary">Enviar comentário</button>
+                <a href="{% url 'detalhe' noticia.id %}" class="btn btn-secondary">Cancelar</a>
+            </form>
+        </div>
+    </div>
+
+{% endblock %}

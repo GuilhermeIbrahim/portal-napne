@@ -136,7 +136,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Fortaleza'
 
 USE_I18N = True
 
@@ -186,6 +186,7 @@ ADMINLTE = {
     {"text": "Nova notícia", "route": "criar_noticia", "icon": "bi bi-plus-circle"},
     {"text": "PEIs recebidos", "route": "listar_peis", "icon": "bi bi-list"},
     {"text": "Solicitações NAPNE", "route": "solicitacoes_napne", "icon": "bi bi-person-check"},
+    {"text": "Feedbacks privados", "route": "listar_feedbacks_privados", "icon": "bi bi-chat-left-text"},
     {"text": "Apresentação do NAPNE", "route": "editar_apresentacao_napne", "icon": "bi bi-easel"},
     {"text": "Ver site público", "route": "index", "icon": "bi bi-box-arrow-up-right"},
     ],

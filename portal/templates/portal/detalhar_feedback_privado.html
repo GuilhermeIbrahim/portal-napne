@@ -1,0 +1,45 @@
+{% extends "portal/base.html" %}
+
+{% block title %}Feedback privado | Portal NAPNE{% endblock %}
+
+{% block content %}
+
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'index' %}">Notícias</a></li>
+            <li class="breadcrumb-item active">Feedback privado</li>
+        </ol>
+    </nav>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h1 class="h4 mb-3">Feedback privado</h1>
+
+            <p><strong>Autor:</strong> {{ feedback.autor.get_full_name|default:feedback.autor.username }}</p>
+            <p>
+                <strong>Notícia vinculada:</strong>
+                {% if feedback.noticia %}
+                    <a href="{% url 'detalhe' feedback.noticia.id %}">{{ feedback.noticia.titulo }}</a>
+                {% else %}
+                    <span class="text-muted">Nenhuma</span>
+                {% endif %}
+            </p>
+            <p><strong>Enviado em:</strong> {{ feedback.data }}</p>
+            {% if feedback.editado_em %}
+                <p><strong>Editado em:</strong> {{ feedback.editado_em }}</p>
+            {% endif %}
+            <hr>
+            <p style="white-space: pre-line;">{{ feedback.conteudo }}</p>
+        </div>
+        {% if request.user == feedback.autor %}
+            <div class="card-footer bg-white d-flex gap-2">
+                <a href="{% url 'editar_feedback_privado' feedback.id %}" class="btn btn-sm btn-warning">
+                    <i class="bi bi-pencil"></i> Editar
+                </a>
+            </div>
+        {% endif %}
+    </div>
+
+    <a href="{% url 'index' %}" class="btn btn-link mt-3 ps-0">&laquo; Voltar</a>
+
+{% endblock %}
