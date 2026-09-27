@@ -53,6 +53,19 @@
                 {% endfill %}
             {% endcomponent %}
         </div>
+
+        <div class="col-md-6 mb-4">
+            {% component "adminlte_card" title="Apresentação do NAPNE" icon="bi bi-easel" theme="primary" %}
+                {% fill "default" %}
+                    <p class="text-muted mb-0">Título, texto e carrossel de imagens da tela "Sobre o NAPNE".</p>
+                {% endfill %}
+                {% fill "footer" %}
+                    <a href="{% url 'editar_apresentacao_napne' %}" class="btn btn-sm btn-primary">
+                        <i class="bi bi-pencil"></i> Editar apresentação
+                    </a>
+                {% endfill %}
+            {% endcomponent %}
+        </div>
     </div>
 
 {% endblock %}

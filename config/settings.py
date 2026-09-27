@@ -187,6 +187,7 @@ ADMINLTE = {
     {"text": "PEIs recebidos", "route": "listar_peis", "icon": "bi bi-list"},
     {"text": "Solicitações NAPNE", "route": "solicitacoes_napne", "icon": "bi bi-person-check"},
     {"text": "Feedbacks privados", "route": "listar_feedbacks_privados", "icon": "bi bi-chat-left-text"},
+    {"text": "Apresentação do NAPNE", "route": "editar_apresentacao_napne", "icon": "bi bi-easel"},
     {"text": "Ver site público", "route": "index", "icon": "bi bi-box-arrow-up-right"},
     ],
     "usermenu_enabled": True,

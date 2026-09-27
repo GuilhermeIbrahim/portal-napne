@@ -1,0 +1,53 @@
+{% extends "portal/base.html" %}
+{% load portal_extras %}
+
+{% block title %}{{ apresentacao.titulo }} | Portal NAPNE{% endblock %}
+
+{% block content %}
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">{{ apresentacao.titulo }}</h1>
+        {% if request.user|has_group:"NAPNE" %}
+            <a href="{% url 'editar_apresentacao_napne' %}" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-pencil"></i> Editar esta página
+            </a>
+        {% endif %}
+    </div>
+
+    {% if apresentacao.imagens.all %}
+        <div id="carrosselNapne" class="carousel slide mb-4" data-bs-ride="carousel">
+            <div class="carousel-indicators">
+                {% for imagem in apresentacao.imagens.all %}
+                    <button type="button" data-bs-target="#carrosselNapne" data-bs-slide-to="{{ forloop.counter0 }}"
+                            {% if forloop.first %}class="active" aria-current="true"{% endif %}
+                            aria-label="Slide {{ forloop.counter }}"></button>
+                {% endfor %}
+            </div>
+            <div class="carousel-inner rounded shadow-sm">
+                {% for imagem in apresentacao.imagens.all %}
+                    <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                        <img src="{{ imagem.imagem.url }}" class="d-block w-100" alt="{{ imagem.legenda }}" style="max-height: 420px; object-fit: cover;">
+                        {% if imagem.legenda %}
+                            <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded pb-2 pt-2">
+                                <p class="mb-0">{{ imagem.legenda }}</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+            {% if apresentacao.imagens.all|length > 1 %}
+                <button class="carousel-control-prev" type="button" data-bs-target="#carrosselNapne" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Anterior</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carrosselNapne" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Próxima</span>
+                </button>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    <div class="fs-5">{{ apresentacao.conteudo|safe }}</div>
+
+{% endblock %}

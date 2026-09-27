@@ -16,4 +16,5 @@ urlpatterns = [
     path('solicitacoes-napne/<int:id>/aprovar/', views.aprovar_solicitacao_napne, name='aprovar_solicitacao_napne'),
     path('solicitacoes-napne/<int:id>/recusar/', views.recusar_solicitacao_napne, name='recusar_solicitacao_napne'),
     path('listar_feedbacks_privados/', views.listar_feedbacks_privados, name='listar_feedbacks_privados'),
+    path('apresentacao/editar/', views.editar_apresentacao_napne, name='editar_apresentacao_napne'),
 ]

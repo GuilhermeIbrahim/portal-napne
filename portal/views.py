@@ -9,8 +9,7 @@ from django.utils import timezone
 
 from core.decorators import professor_required
 from core.forms import CadastroNapneForm, LoginNapneForm, PeiForm, FeedbackPublicoForm, FeedbackPrivadoForm
-from core.models import FeedbackPrivado, FeedbackPublico, Noticia, SolicitacaoNapne
-
+from core.models import ApresentacaoNapne, FeedbackPrivado, FeedbackPublico, Noticia, SolicitacaoNapne
 
 
 def index(request):
@@ -205,3 +204,7 @@ def detalhar_feedback_publico(request, feedback_id):
         return redirect('index')
 
     return render(request, 'portal/detalhar_feedback_publico.html', {'feedback': feedback})
+def apresentacao_napne(request):
+    apresentacao = ApresentacaoNapne.obter_instancia()
+    context = {'apresentacao': apresentacao}
+    return render(request, 'portal/apresentacao_napne.html', context)

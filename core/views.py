@@ -5,8 +5,8 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 
 from .decorators import napne_required
-from .forms import NoticiaForm, PeiForm
-from .models import FeedbackPrivado, Noticia, Pei, SolicitacaoNapne
+from .forms import ApresentacaoNapneForm, ImagemCarrosselFormSet,NoticiaForm, PeiForm
+from .models import ApresentacaoNapne, FeedbackPrivado, Noticia, Pei, SolicitacaoNapne
 
 
 @napne_required
@@ -123,3 +123,18 @@ def listar_feedbacks_privados(request):
     context = {'feedbacks': feedbacks}
     return render(request, 'core/listar_feedbacks_privados.html', context)
 
+@napne_required
+def editar_apresentacao_napne(request):
+    apresentacao = ApresentacaoNapne.obter_instancia()
+    if request.method == 'POST':
+        form = ApresentacaoNapneForm(request.POST, instance=apresentacao)
+        formset = ImagemCarrosselFormSet(request.POST, request.FILES, instance=apresentacao)
+        if form.is_valid() and formset.is_valid():
+            form.save()
+            formset.save()
+            messages.success(request, 'Tela de apresentação do NAPNE atualizada com sucesso!')
+            return redirect('editar_apresentacao_napne')
+    else:
+        form = ApresentacaoNapneForm(instance=apresentacao)
+        formset = ImagemCarrosselFormSet(instance=apresentacao)
+    return render(request, 'core/editar_apresentacao_napne.html', {'form': form, 'formset': formset})
