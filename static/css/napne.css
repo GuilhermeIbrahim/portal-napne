@@ -1,0 +1,379 @@
+/* ==========================================================================
+   Identidade visual do NAPNE — IFRN Campus São Paulo do Potengi
+   Arquivo compartilhado pelo portal público e pelo painel (AdminLTE).
+
+   Origem das cores: logos dos eventos oficiais (II SINAPNES / IX JORDAI).
+   Os tons "-escuro" são variações das cores da logo, usadas apenas onde a
+   cor original não atinge contraste mínimo (WCAG AA) com texto branco.
+   ========================================================================== */
+
+:root {
+    /* --- Cores da logo ------------------------------------------------- */
+    --napne-roxo: #903888;
+    --napne-roxo-escuro: #7a2e78;
+    --napne-roxo-profundo: #4e1f4d;
+    --napne-vermelho: #d02030;
+    --napne-vermelho-escuro: #b8192a;
+    --napne-laranja: #e89020;
+    --napne-laranja-escuro: #9a5400;
+    --napne-amarelo: #f4d814;
+    --napne-amarelo-escuro: #e0c200;
+    --napne-verde: #609838;
+    --napne-verde-escuro: #3f7a22;
+    --napne-verde-profundo: #2f6a17;
+    --napne-azul: #1898a8;
+    --napne-azul-escuro: #0b6b80;
+
+    /* --- Neutros da identidade ----------------------------------------- */
+    --napne-slate: #4a5578;
+    --napne-slate-escuro: #3b4565;
+    --napne-marinho: #0a1430;
+    --napne-lavanda: #e1daec;          /* fundo do banner dos eventos */
+    --napne-lavanda-clara: #f5f2fa;    /* fundo das páginas */
+
+    /* --- Faixa multicolorida (assinatura visual) ------------------------ */
+    --napne-faixa: linear-gradient(
+        90deg,
+        var(--napne-roxo) 0 16.66%,
+        var(--napne-vermelho) 0 33.33%,
+        var(--napne-laranja) 0 50%,
+        var(--napne-amarelo) 0 66.66%,
+        var(--napne-verde) 0 83.33%,
+        var(--napne-azul) 0 100%
+    );
+
+    /* --- Tipografia ------------------------------------------------------ */
+    --napne-fonte-titulo: "Montserrat", "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+    --napne-fonte-texto: "Open Sans", "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+
+    /* --- Variáveis do Bootstrap 5.3 ------------------------------------- */
+    --bs-body-font-family: var(--napne-fonte-texto);
+    --bs-body-color: #1b2038;
+    --bs-body-bg: var(--napne-lavanda-clara);
+    --bs-heading-color: var(--napne-slate-escuro);
+    --bs-secondary-color: #5a607a;
+    --bs-border-color: #d9d3e6;
+    --bs-border-radius: 0.5rem;
+    --bs-border-radius-lg: 0.85rem;
+
+    --bs-primary: var(--napne-roxo);
+    --bs-primary-rgb: 144, 56, 136;
+    --bs-secondary: var(--napne-slate);
+    --bs-secondary-rgb: 74, 85, 120;
+    --bs-success: var(--napne-verde-escuro);
+    --bs-success-rgb: 63, 122, 34;
+    --bs-info: var(--napne-azul-escuro);
+    --bs-info-rgb: 11, 107, 128;
+    --bs-warning: var(--napne-amarelo);
+    --bs-warning-rgb: 244, 216, 20;
+    --bs-danger: var(--napne-vermelho);
+    --bs-danger-rgb: 208, 32, 48;
+
+    --bs-link-color: var(--napne-roxo);
+    --bs-link-color-rgb: 144, 56, 136;
+    --bs-link-hover-color: var(--napne-roxo-escuro);
+    --bs-link-hover-color-rgb: 122, 46, 120;
+
+    --bs-focus-ring-color: rgba(144, 56, 136, 0.3);
+
+    /* Tons suaves usados por alertas, callouts e badges */
+    --bs-primary-bg-subtle: #f1e2f0;
+    --bs-primary-border-subtle: #dbb6d7;
+    --bs-primary-text-emphasis: var(--napne-roxo-profundo);
+    --bs-success-bg-subtle: #e2f0da;
+    --bs-success-border-subtle: #b5d6a3;
+    --bs-success-text-emphasis: #214d10;
+    --bs-info-bg-subtle: #dcf0f4;
+    --bs-info-border-subtle: #a6d6df;
+    --bs-info-text-emphasis: #064453;
+    --bs-warning-bg-subtle: #fdf5c4;
+    --bs-warning-border-subtle: #f3e482;
+    --bs-warning-text-emphasis: #5c4a00;
+    --bs-danger-bg-subtle: #fbe0e3;
+    --bs-danger-border-subtle: #f1aab1;
+    --bs-danger-text-emphasis: #78101b;
+}
+
+/* --------------------------------------------------------------------------
+   Base
+   -------------------------------------------------------------------------- */
+body {
+    font-family: var(--napne-fonte-texto);
+    background-color: var(--napne-lavanda-clara);
+    color: var(--bs-body-color);
+}
+
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
+    font-family: var(--napne-fonte-titulo);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+
+/* Foco visível e consistente (acessibilidade) */
+:focus-visible {
+    outline: 3px solid var(--napne-azul-escuro);
+    outline-offset: 2px;
+    border-radius: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   Botões
+   -------------------------------------------------------------------------- */
+.btn {
+    --bs-btn-font-weight: 600;
+    font-family: var(--napne-fonte-titulo);
+    letter-spacing: 0.01em;
+}
+
+.btn-primary {
+    --bs-btn-bg: var(--napne-roxo);
+    --bs-btn-border-color: var(--napne-roxo);
+    --bs-btn-hover-bg: var(--napne-roxo-escuro);
+    --bs-btn-hover-border-color: var(--napne-roxo-escuro);
+    --bs-btn-active-bg: var(--napne-roxo-profundo);
+    --bs-btn-active-border-color: var(--napne-roxo-profundo);
+    --bs-btn-disabled-bg: var(--napne-roxo);
+    --bs-btn-disabled-border-color: var(--napne-roxo);
+    --bs-btn-focus-shadow-rgb: 144, 56, 136;
+}
+
+.btn-outline-primary {
+    --bs-btn-color: var(--napne-roxo);
+    --bs-btn-border-color: var(--napne-roxo);
+    --bs-btn-hover-bg: var(--napne-roxo);
+    --bs-btn-hover-border-color: var(--napne-roxo);
+    --bs-btn-active-bg: var(--napne-roxo-escuro);
+    --bs-btn-active-border-color: var(--napne-roxo-escuro);
+    --bs-btn-disabled-color: var(--napne-roxo);
+    --bs-btn-disabled-border-color: var(--napne-roxo);
+    --bs-btn-focus-shadow-rgb: 144, 56, 136;
+}
+
+.btn-secondary {
+    --bs-btn-bg: var(--napne-slate);
+    --bs-btn-border-color: var(--napne-slate);
+    --bs-btn-hover-bg: var(--napne-slate-escuro);
+    --bs-btn-hover-border-color: var(--napne-slate-escuro);
+    --bs-btn-active-bg: var(--napne-marinho);
+    --bs-btn-active-border-color: var(--napne-marinho);
+    --bs-btn-disabled-bg: var(--napne-slate);
+    --bs-btn-disabled-border-color: var(--napne-slate);
+    --bs-btn-focus-shadow-rgb: 74, 85, 120;
+}
+
+.btn-outline-secondary {
+    --bs-btn-color: var(--napne-slate);
+    --bs-btn-border-color: var(--napne-slate);
+    --bs-btn-hover-bg: var(--napne-slate);
+    --bs-btn-hover-border-color: var(--napne-slate);
+    --bs-btn-active-bg: var(--napne-slate-escuro);
+    --bs-btn-active-border-color: var(--napne-slate-escuro);
+    --bs-btn-disabled-color: var(--napne-slate);
+    --bs-btn-disabled-border-color: var(--napne-slate);
+    --bs-btn-focus-shadow-rgb: 74, 85, 120;
+}
+
+.btn-success {
+    --bs-btn-bg: var(--napne-verde-escuro);
+    --bs-btn-border-color: var(--napne-verde-escuro);
+    --bs-btn-hover-bg: var(--napne-verde-profundo);
+    --bs-btn-hover-border-color: var(--napne-verde-profundo);
+    --bs-btn-active-bg: #245212;
+    --bs-btn-active-border-color: #245212;
+    --bs-btn-disabled-bg: var(--napne-verde-escuro);
+    --bs-btn-disabled-border-color: var(--napne-verde-escuro);
+    --bs-btn-focus-shadow-rgb: 63, 122, 34;
+}
+
+.btn-outline-success {
+    --bs-btn-color: var(--napne-verde-escuro);
+    --bs-btn-border-color: var(--napne-verde-escuro);
+    --bs-btn-hover-bg: var(--napne-verde-escuro);
+    --bs-btn-hover-border-color: var(--napne-verde-escuro);
+    --bs-btn-active-bg: var(--napne-verde-profundo);
+    --bs-btn-active-border-color: var(--napne-verde-profundo);
+    --bs-btn-focus-shadow-rgb: 63, 122, 34;
+}
+
+.btn-danger {
+    --bs-btn-bg: var(--napne-vermelho);
+    --bs-btn-border-color: var(--napne-vermelho);
+    --bs-btn-hover-bg: var(--napne-vermelho-escuro);
+    --bs-btn-hover-border-color: var(--napne-vermelho-escuro);
+    --bs-btn-active-bg: #96121f;
+    --bs-btn-active-border-color: #96121f;
+    --bs-btn-disabled-bg: var(--napne-vermelho);
+    --bs-btn-disabled-border-color: var(--napne-vermelho);
+    --bs-btn-focus-shadow-rgb: 208, 32, 48;
+}
+
+.btn-outline-danger {
+    --bs-btn-color: var(--napne-vermelho-escuro);
+    --bs-btn-border-color: var(--napne-vermelho-escuro);
+    --bs-btn-hover-bg: var(--napne-vermelho);
+    --bs-btn-hover-border-color: var(--napne-vermelho);
+    --bs-btn-active-bg: var(--napne-vermelho-escuro);
+    --bs-btn-active-border-color: var(--napne-vermelho-escuro);
+    --bs-btn-focus-shadow-rgb: 208, 32, 48;
+}
+
+.btn-warning {
+    --bs-btn-color: var(--napne-marinho);
+    --bs-btn-bg: var(--napne-amarelo);
+    --bs-btn-border-color: var(--napne-amarelo);
+    --bs-btn-hover-color: var(--napne-marinho);
+    --bs-btn-hover-bg: var(--napne-amarelo-escuro);
+    --bs-btn-hover-border-color: var(--napne-amarelo-escuro);
+    --bs-btn-active-color: var(--napne-marinho);
+    --bs-btn-active-bg: var(--napne-amarelo-escuro);
+    --bs-btn-active-border-color: var(--napne-amarelo-escuro);
+    --bs-btn-focus-shadow-rgb: 244, 216, 20;
+}
+
+.btn-outline-warning {
+    --bs-btn-color: var(--napne-laranja-escuro);
+    --bs-btn-border-color: var(--napne-laranja-escuro);
+    --bs-btn-hover-color: var(--napne-marinho);
+    --bs-btn-hover-bg: var(--napne-amarelo);
+    --bs-btn-hover-border-color: var(--napne-amarelo);
+    --bs-btn-active-color: var(--napne-marinho);
+    --bs-btn-active-bg: var(--napne-amarelo-escuro);
+    --bs-btn-active-border-color: var(--napne-amarelo-escuro);
+    --bs-btn-focus-shadow-rgb: 232, 144, 32;
+}
+
+.btn-info {
+    --bs-btn-color: #fff;
+    --bs-btn-bg: var(--napne-azul-escuro);
+    --bs-btn-border-color: var(--napne-azul-escuro);
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: #095a6c;
+    --bs-btn-hover-border-color: #095a6c;
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: #074a59;
+    --bs-btn-active-border-color: #074a59;
+    --bs-btn-focus-shadow-rgb: 11, 107, 128;
+}
+
+.btn-link {
+    --bs-btn-color: var(--napne-roxo);
+    --bs-btn-hover-color: var(--napne-roxo-escuro);
+}
+
+/* --------------------------------------------------------------------------
+   Selos, alertas e utilitários de cor
+   -------------------------------------------------------------------------- */
+.text-bg-info {
+    color: #fff !important;
+}
+
+.text-bg-warning {
+    color: var(--napne-marinho) !important;
+}
+
+/* O Django usa a tag "error" nas mensagens; o Bootstrap só conhece "danger". */
+.alert-error {
+    --bs-alert-color: var(--bs-danger-text-emphasis);
+    --bs-alert-bg: var(--bs-danger-bg-subtle);
+    --bs-alert-border-color: var(--bs-danger-border-subtle);
+    --bs-alert-link-color: var(--bs-danger-text-emphasis);
+}
+
+.alert {
+    border-left-width: 5px;
+}
+
+/* --------------------------------------------------------------------------
+   Formulários
+   -------------------------------------------------------------------------- */
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--napne-roxo);
+    box-shadow: 0 0 0 0.25rem rgba(144, 56, 136, 0.25);
+}
+
+.form-check-input:checked {
+    background-color: var(--napne-roxo);
+    border-color: var(--napne-roxo);
+}
+
+.form-check-input:focus {
+    border-color: var(--napne-roxo);
+    box-shadow: 0 0 0 0.25rem rgba(144, 56, 136, 0.25);
+}
+
+.form-label,
+label {
+    font-weight: 600;
+    color: var(--napne-slate-escuro);
+}
+
+/* --------------------------------------------------------------------------
+   Navegação auxiliar: breadcrumb e paginação
+   -------------------------------------------------------------------------- */
+.breadcrumb {
+    --bs-breadcrumb-divider-color: var(--napne-roxo);
+    --bs-breadcrumb-item-active-color: var(--napne-slate);
+}
+
+.pagination {
+    --bs-pagination-color: var(--napne-roxo);
+    --bs-pagination-hover-color: var(--napne-roxo-escuro);
+    --bs-pagination-hover-bg: var(--bs-primary-bg-subtle);
+    --bs-pagination-focus-color: var(--napne-roxo-escuro);
+    --bs-pagination-focus-bg: var(--bs-primary-bg-subtle);
+    --bs-pagination-focus-box-shadow: 0 0 0 0.25rem rgba(144, 56, 136, 0.25);
+    --bs-pagination-active-bg: var(--napne-roxo);
+    --bs-pagination-active-border-color: var(--napne-roxo);
+    --bs-pagination-active-color: #fff;
+    --bs-pagination-disabled-color: #7b8099;
+}
+
+/* --------------------------------------------------------------------------
+   Componentes da identidade
+   -------------------------------------------------------------------------- */
+
+/* Faixa multicolorida usada como separador em navbar, rodapé e títulos */
+.faixa-napne {
+    height: 6px;
+    background: var(--napne-faixa);
+}
+
+/* Título de seção com a barra colorida embaixo */
+.titulo-secao {
+    position: relative;
+    padding-bottom: 0.65rem;
+    color: var(--napne-slate-escuro);
+}
+
+.titulo-secao::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 4.5rem;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--napne-faixa);
+}
+
+/* Preserva quebras de linha de textos digitados em <textarea> */
+.texto-pre-line {
+    white-space: pre-line;
+}
+
+/* Botões de ação que ficam acima de um link "stretched-link" */
+.acao-sobreposta {
+    position: relative;
+    z-index: 2;
+}
