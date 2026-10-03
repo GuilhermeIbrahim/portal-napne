@@ -1,0 +1,13 @@
+{% extends "adminlte/page.html" %}
+{% load static %}
+
+{% block extra_css %}
+    {% include "partials/_identidade_visual.html" %}
+    <link rel="stylesheet" href="{% static 'css/painel.css' %}">
+    {% block painel_css %}{% endblock %}
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'js/confirmar-acao.js' %}"></script>
+    {% block painel_js %}{% endblock %}
+{% endblock %}
