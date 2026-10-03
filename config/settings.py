@@ -182,7 +182,7 @@ ADMINLTE = {
     "title_postfix": "| Portal NAPNE",
     "logo": "<b>NAPNE</b> Portal",
     "logo_alt_text": "Portal NAPNE",
-    "logo_img": "img/logo-napne.img",
+    "logo_img": "img/logo-napne.png",
     "logo_img_class": "brand-image",
     "logo_img_alt": "Logo do NAPNE",
     "sidebar_theme": "dark",
