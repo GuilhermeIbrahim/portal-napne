@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 
 from pathlib import Path
 
-from decouple import config, Csv
+from decouple import Csv, config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -107,12 +107,12 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': config('DB_ENGINE', default='django.db.backends.sqlite3'),
-        'NAME': config('DB_NAME', default=BASE_DIR / 'db.sqlite3',
-	'USER': config('DB_USER', default=''),
-	'PASSWORD': config('DB_PASSWORD', default=''),
-	'HOST': config('DB_HOST', default=''),
-	'PORT': config('DB_PORT', default=''),
-	'OPTIONS': {'sql_mode': 'traditional'} if config('DB_ENGINE', default='') == 'django.db.backends.mysql' else {},
+        'NAME': config('DB_NAME', default=BASE_DIR / 'db.sqlite3'),
+	    'USER': config('DB_USER', default=''),
+	    'PASSWORD': config('DB_PASSWORD', default=''),
+	    'HOST': config('DB_HOST', default=''),
+	    'PORT': config('DB_PORT', default=''),
+	    'OPTIONS': {'sql_mode': 'traditional'} if config('DB_ENGINE', default='') == 'django.db.backends.mysql' else {},
     }
 }
 
@@ -139,7 +139,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/6.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'pt-br'
 
 TIME_ZONE = 'America/Fortaleza'
 
@@ -182,10 +182,17 @@ ADMINLTE = {
     "title_postfix": "| Portal NAPNE",
     "logo": "<b>NAPNE</b> Portal",
     "logo_alt_text": "Portal NAPNE",
+    "logo_img": "img/logo-napne.png",
+    "logo_img_class": "brand-image logo-napne",
+    "logo_img_alt": "",
     "sidebar_theme": "dark",
     "sidebar_mini": True,
     "assets_mode": "static",
     "footer_left": "&copy; Portal NAPNE",
+    "footer_right": "IFRN &mdash; Campus São Paulo do Potengi",
+    "sidebar_docs_url": "None",
+    "classes_sidebar": "shadow",
+    "classes_brand_text": "",
     "menu": [
     {"text": "Painel", "route": "painel_home", "icon": "bi bi-speedometer2"},
     {"text": "Nova notícia", "route": "criar_noticia", "icon": "bi bi-plus-circle"},
@@ -196,6 +203,8 @@ ADMINLTE = {
     {"text": "Ver site público", "route": "index", "icon": "bi bi-box-arrow-up-right"},
     ],
     "usermenu_enabled": True,
+    "navbar_search": False,
+    "color_mode_toggle": False,
 }
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
@@ -208,6 +217,7 @@ CKEDITOR_5_FILE_UPLOAD_PERMISSION = "authenticated"
 
 CKEDITOR_5_CONFIGS = {
     "default": {
+        "language": "pt-br",
         "toolbar": [
             "heading", "|",
             "bold", "italic", "underline", "|",

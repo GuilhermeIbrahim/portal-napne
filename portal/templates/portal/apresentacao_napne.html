@@ -26,7 +26,7 @@
             <div class="carousel-inner rounded shadow-sm">
                 {% for imagem in apresentacao.imagens.all %}
                     <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                        <img src="{{ imagem.imagem.url }}" class="d-block w-100" alt="{{ imagem.legenda }}" style="max-height: 420px; object-fit: cover;">
+                        <img src="{{ imagem.imagem.url }}" class="d-block w-100 carrossel-img" alt="{{ imagem.legenda }}">
                         {% if imagem.legenda %}
                             <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded pb-2 pt-2">
                                 <p class="mb-0">{{ imagem.legenda }}</p>

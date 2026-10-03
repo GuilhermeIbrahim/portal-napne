@@ -1,0 +1,174 @@
+/* ==========================================================================
+   Painel do NAPNE (AdminLTE 4) — aplica a identidade visual do núcleo.
+   Depende de napne.css e é carregado depois do CSS do AdminLTE.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Variantes de card/callout do AdminLTE (cores fixas por padrão)
+   -------------------------------------------------------------------------- */
+.card-primary,
+.text-bg-primary {
+    --lte-card-variant-bg: var(--napne-roxo);
+    --lte-card-variant-bg-rgb: 144, 56, 136;
+    --lte-card-variant-color: #fff;
+    --lte-card-variant-color-rgb: 255, 255, 255;
+}
+
+.card-secondary {
+    --lte-card-variant-bg: var(--napne-slate);
+    --lte-card-variant-bg-rgb: 74, 85, 120;
+}
+
+.card-success {
+    --lte-card-variant-bg: var(--napne-verde-escuro);
+    --lte-card-variant-bg-rgb: 63, 122, 34;
+}
+
+.card-info {
+    --lte-card-variant-bg: var(--napne-azul-escuro);
+    --lte-card-variant-bg-rgb: 11, 107, 128;
+}
+
+.card-danger {
+    --lte-card-variant-bg: var(--napne-vermelho);
+    --lte-card-variant-bg-rgb: 208, 32, 48;
+}
+
+.card-warning {
+    --lte-card-variant-bg: var(--napne-amarelo);
+    --lte-card-variant-bg-rgb: 244, 216, 20;
+    --lte-card-variant-color: var(--napne-marinho);
+    --lte-card-variant-color-rgb: 10, 20, 48;
+}
+
+/* --------------------------------------------------------------------------
+   Barra superior
+   -------------------------------------------------------------------------- */
+.app-header {
+    border-bottom: 0;
+    background-color: #fff;
+    position: relative;
+}
+
+.app-header::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 5px;
+    background: var(--napne-faixa);
+}
+
+/* --------------------------------------------------------------------------
+   Barra lateral
+   -------------------------------------------------------------------------- */
+.app-sidebar,
+[data-bs-theme="dark"].app-sidebar {
+    --lte-sidebar-hover-bg: rgba(255, 255, 255, 0.12);
+    --lte-sidebar-menu-active-bg: var(--napne-roxo);
+    --lte-sidebar-menu-active-color: #fff;
+    --lte-sidebar-color: rgba(255, 255, 255, 0.88);
+    background-color: var(--napne-roxo-profundo);
+    border-right: 0;
+}
+
+.app-sidebar .sidebar-brand {
+    background-color: var(--napne-roxo-profundo);
+    border-bottom: 4px solid transparent;
+    border-image: var(--napne-faixa) 1;
+}
+
+.app-sidebar .brand-link {
+    display: flex;
+    align-items: center;
+    color: #fff;
+}
+
+.app-sidebar .brand-image {
+    /* Tamanho fixo e sem encolher: evita a "elipse" quando o menu anima ou a imagem falha */
+    box-sizing: border-box;
+    flex: 0 0 2.1rem;
+    width: 2.1rem;
+    min-width: 2.1rem;
+    height: 2.1rem;
+    max-height: none;
+    padding: 0.2rem;
+    overflow: hidden;
+    border-radius: 50%;
+    background: #fff;
+    object-fit: contain;
+    opacity: 1;
+    box-shadow: none;
+    /* Se a imagem quebrar, não exibir o texto alternativo */
+    font-size: 0;
+    color: transparent;
+}
+
+.app-sidebar .brand-text {
+    white-space: nowrap;
+}
+
+.app-sidebar .brand-text {
+    font-family: var(--napne-fonte-titulo);
+    font-weight: 800;
+    letter-spacing: -0.01em;
+}
+
+.app-sidebar .sidebar-menu > .nav-item > .nav-link {
+    font-family: var(--napne-fonte-titulo);
+    font-weight: 600;
+    font-size: 0.9rem;
+    border-left: 4px solid transparent;
+}
+
+.app-sidebar .sidebar-menu > .nav-item > .nav-link.active {
+    border-left-color: var(--napne-amarelo);
+}
+
+.app-sidebar .sidebar-menu > .nav-item > .nav-link:focus-visible {
+    outline-color: #fff;
+}
+
+/* --------------------------------------------------------------------------
+   Conteúdo
+   -------------------------------------------------------------------------- */
+.app-content-header h3 {
+    font-family: var(--napne-fonte-titulo);
+    font-weight: 800;
+    color: var(--napne-slate-escuro);
+}
+
+.app-main {
+    background-color: var(--napne-lavanda-clara);
+}
+
+.card {
+    border-radius: var(--bs-border-radius-lg);
+    overflow: hidden;
+}
+
+.card-header .card-title,
+.card-title {
+    font-family: var(--napne-fonte-titulo);
+    font-weight: 700;
+}
+
+.table > thead th {
+    font-family: var(--napne-fonte-titulo);
+    color: var(--napne-slate-escuro);
+    border-bottom-color: var(--napne-roxo);
+}
+
+.preview-imagem-form {
+    max-height: 140px;
+}
+
+.app-footer {
+    border-top: 1px solid var(--bs-border-color);
+}
+
+/* Dropdown do menu do usuário */
+.app-header .dropdown-menu {
+    --bs-dropdown-min-width: 8rem;
+}

@@ -1,26 +1,33 @@
 {% extends "portal/base.html" %}
-{% load portal_extras %}
+{% load static portal_extras %}
 
 {% block title %}Notícias | Portal NAPNE{% endblock %}
+
+{% block banner %}
+    <section class="banner-evento" aria-label="Eventos oficiais do NAPNE">
+        <img src="{% static 'img/banner-eventos.jpg' %}" alt="II SINAPNES e IX JORDAI. Protagonismo Equidade e Formação no Fomento de um Espaço Educacional Inclusivo.">
+    </section>
+{% endblock %}
 
 {% block content %}
 
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3 mb-0">Notícias</h1>
+        <h1 class="h3 mb-0 titulo-secao">Notícias</h1>
     </div>
 
     <div class="mb-4 position-relative">
-        <input type="text" id="campo-pesquisa" class="form-control" placeholder="Pesquisar notícias..." autocomplete="off">
+        <label for="campo-pesquisa" class="visually-hidden">Pesquisar notícias</label>
+        <input type="text" id="campo-pesquisa" class="form-control" placeholder="Pesquisar notícias..." autocomplete="off" data-url-pesquisa="{% url 'pesquisar_noticias' %}">
 
-        <div id="sugestoes-pesquisa" class="list-group position-absolute w-100 shadow-sm d-none" style="z-index: 1000;"></div>
+        <div id="sugestoes-pesquisa" class="list-group position-absolute w-100 shadow-sm d-none sugestoes-pesquisa"></div>
     </div>
 
     <div class="row" id="lista-noticias">
         {% for noticia in noticias %}
             <div class="col-md-6 col-lg-4 mb-4">
-                <div class="card h-100 shadow-sm">
+                <div class="card card-noticia h-100 shadow-sm">
                     {% if noticia.imagem %}
-                        <img src="{{ noticia.imagem.url }}" class="card-img-top" alt="{{ noticia.titulo }}" style="height: 180px; object-fit: cover;">
+                        <img src="{{ noticia.imagem.url }}" class="card-img-top noticia-card-img" alt="">
                     {% endif %}
                     <div class="card-body d-flex flex-column">
                         <h2 class="h5 card-title">{{ noticia.titulo }}</h2>
@@ -86,68 +93,5 @@
 {% endblock %}
 
 {% block extra_js %}
-<script>
-    const campoPesquisa = document.getElementById('campo-pesquisa');
-    const caixaSugestoes = document.getElementById('sugestoes-pesquisa');
-
-    let temporizador = null;
-
-    campoPesquisa.addEventListener('input', function () {
-        const termo = campoPesquisa.value.trim();
-
-        clearTimeout(temporizador);
-
-        if (termo.length === 0) {
-            caixaSugestoes.classList.add('d-none');
-            caixaSugestoes.innerHTML = '';
-            return;
-        }
-
-        temporizador = setTimeout(function () {
-            buscarNoticias(termo);
-        }, 300);
-    });
-
-    function buscarNoticias(termo) {
-        const url = "{% url 'pesquisar_noticias' %}?q=" + encodeURIComponent(termo);
-
-        fetch(url)
-            .then(function (resposta) {
-                return resposta.json();
-            })
-            .then(function (dados) {
-                mostrarSugestoes(dados.resultados);
-            })
-            .catch(function (erro) {
-                console.error('Erro ao pesquisar notícias:', erro);
-            });
-    }
-
-    function mostrarSugestoes(resultados) {
-        caixaSugestoes.innerHTML = '';
-
-        if (resultados.length === 0) {
-            caixaSugestoes.innerHTML = '<div class="list-group-item text-muted">Nenhuma notícia encontrada.</div>';
-            caixaSugestoes.classList.remove('d-none');
-            return;
-        }
-
-        resultados.forEach(function (noticia) {
-            const link = document.createElement('a');
-            link.href = noticia.url;
-            link.className = 'list-group-item list-group-item-action';
-            link.textContent = noticia.titulo;
-            caixaSugestoes.appendChild(link);
-        });
-
-        caixaSugestoes.classList.remove('d-none');
-    }
-
-    document.addEventListener('click', function (evento) {
-        const cliqueForaDaCaixa = !campoPesquisa.contains(evento.target) && !caixaSugestoes.contains(evento.target);
-        if (cliqueForaDaCaixa) {
-            caixaSugestoes.classList.add('d-none');
-        }
-    });
-</script>
+<script src="{% static 'js/pesquisa-noticias.js' %}"></script>
 {% endblock %}

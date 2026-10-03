@@ -1,0 +1,18 @@
+{% extends "adminlte/page.html" %}
+{% load static %}
+
+{% block meta %}
+    <script src="{% static 'js/tema-claro.js' %}"></script>
+{% endblock %}
+
+{% block extra_css %}
+    {% include "partials/_identidade_visual.html" %}
+    <link rel="stylesheet" href="{% static 'css/painel.css' %}">
+    {% block painel_css %}{% endblock %}
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'js/confirmar-acao.js' %}"></script>
+    <script src="{% static 'js/logo-fallback.js' %}"></script>
+    {% block painel_js %}{% endblock %}
+{% endblock %}

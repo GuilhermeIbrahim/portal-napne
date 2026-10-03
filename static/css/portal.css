@@ -1,0 +1,375 @@
+/* ==========================================================================
+   Portal público — layout base (navbar, banner, cards, rodapé)
+   Depende de napne.css.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Link "pular para o conteúdo" (acessibilidade)
+   -------------------------------------------------------------------------- */
+.skip-link {
+    position: absolute;
+    top: -4rem;
+    left: 1rem;
+    z-index: 2000;
+    padding: 0.6rem 1rem;
+    border-radius: 0 0 0.5rem 0.5rem;
+    background: var(--napne-marinho);
+    color: #fff;
+    font-weight: 700;
+    text-decoration: none;
+    transition: top 0.15s ease-in-out;
+}
+
+.skip-link:focus {
+    top: 0;
+    color: #fff;
+}
+
+/* --------------------------------------------------------------------------
+   Navbar
+   -------------------------------------------------------------------------- */
+.navbar-napne {
+    background-color: var(--napne-roxo);
+    --bs-navbar-color: rgba(255, 255, 255, 0.9);
+    --bs-navbar-hover-color: #fff;
+    --bs-navbar-active-color: #fff;
+    --bs-navbar-brand-color: #fff;
+    --bs-navbar-brand-hover-color: #fff;
+    --bs-navbar-toggler-border-color: rgba(255, 255, 255, 0.6);
+    --bs-navbar-toggler-focus-width: 0.2rem;
+}
+
+.navbar-napne .navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: var(--napne-fonte-titulo);
+    font-weight: 800;
+    line-height: 1.1;
+}
+
+.navbar-napne .brand-logo {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: #fff;
+}
+
+.navbar-napne .brand-logo img {
+    width: 2.1rem;
+    height: 2.1rem;
+    object-fit: contain;
+}
+
+/* Se a imagem da logo falhar (js/logo-fallback.js), some também o círculo branco */
+.navbar-napne .brand-logo:has(img.d-none) {
+    display: none;
+}
+
+.navbar-napne .brand-texto small {
+    display: block;
+    font-weight: 600;
+    font-size: 0.68rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    opacity: 0.9;
+}
+
+.navbar-napne .nav-link,
+.navbar-napne .btn {
+    white-space: nowrap;
+}
+
+.navbar-napne .nav-link {
+    font-family: var(--napne-fonte-titulo);
+    font-weight: 600;
+    font-size: 0.92rem;
+    border-bottom: 3px solid transparent;
+}
+
+.navbar-napne .nav-link:hover,
+.navbar-napne .nav-link:focus {
+    border-bottom-color: var(--napne-amarelo);
+}
+
+.navbar-napne :focus-visible {
+    outline-color: #fff;
+}
+
+/* --------------------------------------------------------------------------
+   Banner dos eventos oficiais
+   O fundo usa a mesma cor da imagem para que ela se funda com a faixa.
+   -------------------------------------------------------------------------- */
+.banner-evento {
+    background-color: var(--napne-lavanda);
+    border-bottom: 1px solid #d3c9e4;
+}
+
+.banner-evento img {
+    display: block;
+    width: 100%;
+    max-width: 720px;
+    height: auto;
+    margin: 0 auto;
+}
+
+/* --------------------------------------------------------------------------
+   Cards de notícia e conteúdo
+   -------------------------------------------------------------------------- */
+.card {
+    border-color: #e4def0;
+    border-radius: var(--bs-border-radius-lg);
+}
+
+.card-noticia {
+    --cor-card: var(--napne-roxo);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+/* Faixa de cor no topo do card (recortada pelo arredondamento do card) */
+.card-noticia::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    z-index: 1;
+    height: 5px;
+    background-color: var(--cor-card);
+}
+
+.card-noticia:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0.6rem 1.2rem rgba(78, 31, 77, 0.15) !important;
+}
+
+/* Cada card de notícia recebe uma cor da logo, em sequência */
+#lista-noticias > div:nth-child(6n + 2) .card-noticia { --cor-card: var(--napne-vermelho); }
+#lista-noticias > div:nth-child(6n + 3) .card-noticia { --cor-card: var(--napne-laranja); }
+#lista-noticias > div:nth-child(6n + 4) .card-noticia { --cor-card: var(--napne-amarelo); }
+#lista-noticias > div:nth-child(6n + 5) .card-noticia { --cor-card: var(--napne-verde); }
+#lista-noticias > div:nth-child(6n + 6) .card-noticia { --cor-card: var(--napne-azul); }
+
+.noticia-card-img {
+    height: 180px;
+    object-fit: cover;
+}
+
+.noticia-detalhe-img {
+    max-height: 360px;
+    object-fit: cover;
+}
+
+.carrossel-img {
+    max-height: 420px;
+    object-fit: cover;
+}
+
+.card-footer.bg-white {
+    background-color: #fff !important;
+}
+
+/* --------------------------------------------------------------------------
+   Pesquisa de notícias (caixa de sugestões)
+   -------------------------------------------------------------------------- */
+.sugestoes-pesquisa {
+    z-index: 1000;
+}
+
+.sugestoes-pesquisa .list-group-item-action:hover,
+.sugestoes-pesquisa .list-group-item-action:focus {
+    background-color: var(--bs-primary-bg-subtle);
+    color: var(--napne-roxo-profundo);
+}
+
+/* --------------------------------------------------------------------------
+   Carrossel
+   -------------------------------------------------------------------------- */
+.carousel-indicators [data-bs-target] {
+    background-color: var(--napne-amarelo);
+}
+
+/* --------------------------------------------------------------------------
+   Rodapé
+   -------------------------------------------------------------------------- */
+.rodape-napne {
+    background-color: var(--napne-roxo-profundo);
+    color: rgba(255, 255, 255, 0.92);
+    font-size: 0.9rem;
+}
+
+.rodape-napne strong {
+    font-family: var(--napne-fonte-titulo);
+    color: #fff;
+}
+
+.rodape-napne a {
+    color: #fff;
+}
+
+.rodape-napne :focus-visible {
+    outline-color: #fff;
+}
+
+/* --------------------------------------------------------------------------
+   Página de erro 500 (não depende do Bootstrap, pois não carrega o layout)
+   -------------------------------------------------------------------------- */
+.pagina-erro {
+    max-width: 32rem;
+    margin: 4rem auto;
+    padding: 0 1.5rem;
+    text-align: center;
+    font-family: var(--napne-fonte-texto);
+}
+
+.pagina-erro-codigo {
+    margin: 0;
+    font-family: var(--napne-fonte-titulo);
+    font-size: 5rem;
+    font-weight: 800;
+    color: var(--napne-roxo);
+}
+
+.pagina-erro .titulo-secao {
+    display: inline-block;
+}
+
+.pagina-erro a {
+    color: var(--napne-roxo);
+    font-weight: 700;
+}
+
+/* --------------------------------------------------------------------------
+   Cadastro e login: passos, seções do formulário e regras de senha
+   -------------------------------------------------------------------------- */
+.passos-cadastro {
+    display: grid;
+    gap: 0.75rem;
+    margin: 0 0 1.5rem;
+    padding: 0;
+    list-style: none;
+    counter-reset: passo;
+}
+
+@media (min-width: 768px) {
+    .passos-cadastro {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.passos-cadastro li {
+    position: relative;
+    padding: 0.75rem 0.75rem 0.75rem 3.1rem;
+    border-radius: var(--bs-border-radius);
+    background-color: var(--bs-primary-bg-subtle);
+    color: var(--napne-roxo-profundo);
+    font-size: 0.9rem;
+    line-height: 1.35;
+    counter-increment: passo;
+}
+
+.passos-cadastro li::before {
+    content: counter(passo);
+    position: absolute;
+    top: 50%;
+    left: 0.75rem;
+    display: grid;
+    place-items: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    transform: translateY(-50%);
+    border-radius: 50%;
+    background-color: var(--napne-roxo);
+    color: #fff;
+    font-family: var(--napne-fonte-titulo);
+    font-weight: 800;
+    font-size: 0.85rem;
+}
+
+.passos-cadastro strong {
+    display: block;
+    font-family: var(--napne-fonte-titulo);
+}
+
+.secao-formulario {
+    margin: 1.25rem 0 0.75rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 2px solid var(--bs-primary-bg-subtle);
+    font-family: var(--napne-fonte-titulo);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--napne-roxo);
+}
+
+.secao-formulario:first-child {
+    margin-top: 0;
+}
+
+.regras-senha {
+    margin: -0.25rem 0 1rem;
+    padding: 0.75rem 1rem;
+    border-radius: var(--bs-border-radius);
+    background-color: #fff;
+    border: 1px solid var(--bs-border-color);
+    font-size: 0.875rem;
+}
+
+.regras-senha-titulo {
+    margin-bottom: 0.35rem;
+    font-weight: 700;
+    color: var(--napne-slate-escuro);
+}
+
+.regras-senha-lista {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.regras-senha-lista li {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    padding: 0.1rem 0;
+    color: var(--bs-secondary-color);
+}
+
+.regras-senha-lista li.regra-ok {
+    color: var(--napne-verde-profundo);
+    font-weight: 600;
+}
+
+.form-text,
+.helptext {
+    color: var(--bs-secondary-color);
+    font-size: 0.85rem;
+}
+
+.aviso-suap {
+    border-left: 5px solid var(--napne-azul);
+    background-color: var(--bs-info-bg-subtle);
+    color: var(--bs-info-text-emphasis);
+    border-radius: var(--bs-border-radius);
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+}
+
+.aviso-suap a {
+    color: inherit;
+    font-weight: 700;
+}
+
+/* Com o botão "mostrar senha" o campo fica dentro de um .input-group;
+   o Bootstrap só exibe a mensagem de erro quando ela vem logo após o input. */
+.input-group ~ .invalid-feedback,
+.input-group ~ p.invalid-feedback {
+    display: block;
+}
+
+.input-group > .btn {
+    min-width: 2.75rem;
+}
