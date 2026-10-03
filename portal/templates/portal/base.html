@@ -19,7 +19,7 @@
         <div class="container">
             <a class="navbar-brand" href="{% url 'index' %}">
                 <span class="brand-logo">
-                    <img src="{% static 'img/logo-napne.png' %}" alt="">
+                    <img src="{% static 'img/logo-napne.png' %}" alt="" class="logo-napne">
                 </span>
                 <span class="brand-texto">
                     Portal NAPNE
@@ -120,6 +120,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{% static 'js/confirmar-acao.js' %}"></script>
+    <script src="{% static 'js/logo-fallback.js' %}"></script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>

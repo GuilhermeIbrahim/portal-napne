@@ -86,15 +86,27 @@
 }
 
 .app-sidebar .brand-image {
+    /* Tamanho fixo e sem encolher: evita a "elipse" quando o menu anima ou a imagem falha */
+    box-sizing: border-box;
+    flex: 0 0 2.1rem;
     width: 2.1rem;
+    min-width: 2.1rem;
     height: 2.1rem;
     max-height: none;
     padding: 0.2rem;
+    overflow: hidden;
     border-radius: 50%;
     background: #fff;
     object-fit: contain;
     opacity: 1;
     box-shadow: none;
+    /* Se a imagem quebrar, não exibir o texto alternativo */
+    font-size: 0;
+    color: transparent;
+}
+
+.app-sidebar .brand-text {
+    white-space: nowrap;
 }
 
 .app-sidebar .brand-text {
@@ -146,10 +158,6 @@
     font-family: var(--napne-fonte-titulo);
     color: var(--napne-slate-escuro);
     border-bottom-color: var(--napne-roxo);
-}
-
-.table-hover > tbody > tr:hover > * {
-    --bs-table-hover-bg: var(--bs-primary-bg-subtle);
 }
 
 .preview-imagem-form {

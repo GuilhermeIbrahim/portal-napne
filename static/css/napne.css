@@ -97,6 +97,11 @@
 /* --------------------------------------------------------------------------
    Base
    -------------------------------------------------------------------------- */
+
+:root {
+    color-scheme: light;
+}
+
 body {
     font-family: var(--napne-fonte-texto);
     background-color: var(--napne-lavanda-clara);
@@ -316,6 +321,31 @@ h1, h2, h3, h4, h5, h6,
 label {
     font-weight: 600;
     color: var(--napne-slate-escuro);
+}
+
+/* Botão "Escolher arquivo" dos campos de upload */
+.form-control::file-selector-button {
+    color: var(--napne-roxo-profundo);
+    background-color: var(--bs-primary-bg-subtle);
+    border-color: var(--bs-primary-border-subtle);
+}
+
+.form-control:hover:not(:disabled):not([readonly])::file-selector-button {
+    color: var(--napne-roxo-profundo);
+    background-color: var(--bs-primary-border-subtle);
+}
+
+/* --------------------------------------------------------------------------
+   Tabelas: cores de texto fixas, legíveis também no estado "hover"
+   -------------------------------------------------------------------------- */
+.table {
+    --bs-table-color: var(--bs-body-color);
+    --bs-table-bg: transparent;
+    --bs-table-hover-color: var(--bs-body-color);
+    --bs-table-hover-bg: var(--bs-primary-bg-subtle);
+    --bs-table-striped-color: var(--bs-body-color);
+    --bs-table-active-color: var(--bs-body-color);
+    --bs-table-border-color: var(--bs-border-color);
 }
 
 /* --------------------------------------------------------------------------

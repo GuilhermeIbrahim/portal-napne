@@ -64,6 +64,11 @@
     object-fit: contain;
 }
 
+/* Se a imagem da logo falhar (js/logo-fallback.js), some também o círculo branco */
+.navbar-napne .brand-logo:has(img.d-none) {
+    display: none;
+}
+
 .navbar-napne .brand-texto small {
     display: block;
     font-weight: 600;
