@@ -1,0 +1,16 @@
+{% extends "portal/base.html" %}
+
+{% block title %}Página não encontrada | Portal NAPNE{% endblock %}
+
+{% block content %}
+    <div class="text-center py-5">
+        <p class="display-1 fw-bold text-primary mb-0">404</p>
+        <h1 class="h3 titulo-secao d-inline-block">Página não encontrada</h1>
+        <p class="text-muted mt-3">
+            O endereço que você tentou acessar não existe ou foi removido.
+        </p>
+        <a href="{% url 'index' %}" class="btn btn-primary">
+            <i class="bi bi-house-door" aria-hidden="true"></i> Voltar para o início
+        </a>
+    </div>
+{% endblock %}

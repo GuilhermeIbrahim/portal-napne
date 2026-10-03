@@ -52,9 +52,19 @@ pip install -r requirements.txt
 cp .env.example .env
 ```
 
+- Execute o collectstatic:
+```
+python manage.py collectstatic --noinput
+```
+
 - Execute as migrations:
 ```
 python manage.py migrate
+```
+
+- Crie um superusuário:
+```
+python manage.py createsuperuser
 ```
 
 - Execute o servidor:

@@ -1,0 +1,19 @@
+{% load static %}<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Erro no servidor | Portal NAPNE</title>
+    <link rel="stylesheet" href="{% static 'css/napne.css' %}">
+    <link rel="stylesheet" href="{% static 'css/portal.css' %}">
+</head>
+<body class="d-flex flex-column min-vh-100">
+    <div class="faixa-napne" aria-hidden="true"></div>
+    <main class="pagina-erro">
+        <p class="pagina-erro-codigo">500</p>
+        <h1 class="titulo-secao">Algo deu errado</h1>
+        <p>Tivemos um problema inesperado. Tente novamente em alguns instantes.</p>
+        <a href="/">Voltar para o início</a>
+    </main>
+</body>
+</html>
