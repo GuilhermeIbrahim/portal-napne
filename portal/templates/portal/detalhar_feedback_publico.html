@@ -28,7 +28,7 @@
                 <p><strong>Editado em:</strong> {{ feedback.editado_em }}</p>
             {% endif %}
             <hr>
-            <p style="white-space: pre-line;">{{ feedback.conteudo }}</p>
+            <p class="texto-pre-line">{{ feedback.conteudo }}</p>
         </div>
         {% if request.user == feedback.autor %}
             <div class="card-footer bg-white d-flex gap-2">
