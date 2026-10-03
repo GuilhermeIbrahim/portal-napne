@@ -1,36 +1,61 @@
 {% extends "portal/base.html" %}
-{% load crispy_forms_tags %}
+{% load static crispy_forms_tags %}
 
-{% block title %}Cadastro NAPNE | Portal NAPNE{% endblock %}
+{% block title %}Criar conta NAPNE | Portal NAPNE{% endblock %}
 
 {% block content %}
 
     <div class="row justify-content-center">
-        <div class="col-md-6">
+        <div class="col-lg-8 col-xl-7">
+
+            <h1 class="h3 titulo-secao mb-3">Criar conta de membro do NAPNE</h1>
+            <p class="text-muted">
+                Este cadastro é para quem faz parte da equipe do NAPNE.
+                É rápido: leva menos de um minuto.
+            </p>
+
+            <ol class="passos-cadastro" aria-label="Como funciona">
+                <li><strong>Preencha</strong> seus dados e crie uma senha.</li>
+                <li><strong>Aguarde</strong> a aprovação de um membro do NAPNE.</li>
+                <li><strong>Acesse</strong> o painel quando for aprovado(a).</li>
+            </ol>
+
+            <p class="aviso-suap">
+                <i class="bi bi-info-circle" aria-hidden="true"></i>
+                É aluno(a) ou servidor(a) do IFRN? Você não precisa criar conta aqui:
+                <a href="{% url 'login' %}">entre com o seu SUAP</a>.
+            </p>
+
             <div class="card shadow-sm">
-                <div class="card-header bg-white">
-                    <h1 class="h5 mb-0">Cadastro de membro do NAPNE</h1>
-                </div>
-                <div class="card-body">
-                    <p class="text-muted small">
-                        Qualquer pessoa pode se cadastrar aqui, mas o acesso ao painel do NAPNE só é
-                        liberado depois que um membro já aprovado revisar e aprovar sua solicitação.
-                    </p>
-                    <form method="post">
+                <div class="card-body p-4">
+                    {% if form.errors %}
+                        <div class="alert alert-danger" role="alert">
+                            <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
+                            Não foi possível criar a conta. Revise os campos destacados abaixo e tente novamente.
+                        </div>
+                    {% endif %}
+
+                    <form method="post" novalidate>
                         {% csrf_token %}
                         {% crispy form form.helper %}
-                        <div class="mt-3">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-person-plus"></i> Cadastrar
+                        <div class="d-flex flex-wrap gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-person-plus" aria-hidden="true"></i> Criar minha conta
                             </button>
-                            <a href="{% url 'index' %}" class="btn btn-secondary">Cancelar</a>
+                            <a href="{% url 'index' %}" class="btn btn-outline-secondary btn-lg">Cancelar</a>
                         </div>
                     </form>
-                    <hr>
-                    <p class="mb-0 small">Já tem cadastro? <a href="{% url 'login_napne' %}">Entre aqui</a>.</p>
+                </div>
+                <div class="card-footer bg-white text-center">
+                    Já tem conta? <a href="{% url 'login_napne' %}">Entre aqui</a>.
                 </div>
             </div>
+
         </div>
     </div>
 
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'js/campos-senha.js' %}"></script>
 {% endblock %}
