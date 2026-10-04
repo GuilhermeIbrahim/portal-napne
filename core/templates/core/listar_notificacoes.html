@@ -36,7 +36,7 @@
                             — {{ notificacao.destinatario.get_full_name|default:notificacao.destinatario.username }}
                         {% endif %}
                     </td>
-                    <td>{{ notificacao.remetente.get_full_name|default:notificacao.remetente.username }}</td>
+                    <td>{% if notificacao.remetente %}{{ notificacao.remetente.get_full_name|default:notificacao.remetente.username }}{% else %}<span class="text-muted">Usuário removido</span>{% endif %}</td>
                     <td>{{ notificacao.criado_em|date:"d/m/Y H:i" }}</td>
                     <td class="text-end">
                         <a href="{% url 'editar_notificacao' notificacao.id %}" class="btn btn-sm btn-warning">

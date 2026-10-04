@@ -171,6 +171,12 @@ class Notificacao(models.Model):
                 filtro |= Q(destino_tipo=destino)
 
         return cls.objects.filter(filtro).distinct()
+    
+    @classmethod
+    def nao_lidas_para(cls, user):
+        if not user or not user.is_authenticated:
+            return cls.objects.none()
+        return cls.para_usuario(user).exclude(lida_por=user)
 
 
 class ImagemCarrossel(models.Model):

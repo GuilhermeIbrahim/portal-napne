@@ -4,14 +4,27 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
 from django.db.models import Q
-from django.http import JsonResponse, request
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 
 from core.decorators import professor_required
-from core.forms import CadastroNapneForm, LoginNapneForm, PeiForm, FeedbackPublicoForm, FeedbackPrivadoForm
-from core.models import ApresentacaoNapne, FeedbackPrivado, FeedbackPublico, Noticia, Notificacao, SolicitacaoNapne
+from core.forms import (
+    CadastroNapneForm,
+    FeedbackPrivadoForm,
+    FeedbackPublicoForm,
+    LoginNapneForm,
+    PeiForm,
+)
+from core.models import (
+    ApresentacaoNapne,
+    FeedbackPrivado,
+    FeedbackPublico,
+    Noticia,
+    Notificacao,
+    SolicitacaoNapne,
+)
 
 
 def index(request):
@@ -21,7 +34,7 @@ def index(request):
     page = paginator.get_page(num_pag)
     elided = paginator.get_elided_page_range(number=page.number, on_each_side=2, on_ends=2)
 
-    notificacoes_nao_lidas = Notificacao.para_usuario(request.user).exclude(lida_por=request.user)
+    notificacoes_nao_lidas = Notificacao.nao_lidas_para(request.user)
 
     context = {'noticias': page, 'elided': elided, 'notificacoes_nao_lidas': notificacoes_nao_lidas}
     return render(request, "portal/index.html", context) 
@@ -214,7 +227,7 @@ def apresentacao_napne(request):
     context = {'apresentacao': apresentacao}
     return render(request, 'portal/apresentacao_napne.html', context)
 
-
+@login_required
 def detalhar_notificacao(request, id):
     notificacao = get_object_or_404(Notificacao, id=id)
 

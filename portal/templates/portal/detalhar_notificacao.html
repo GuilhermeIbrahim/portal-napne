@@ -15,7 +15,7 @@
         <div class="card-body">
             <h1 class="h4 mb-1">{{ notificacao.titulo }}</h1>
             <p class="text-muted small mb-3">
-                Enviado por {{ notificacao.remetente.get_full_name|default:notificacao.remetente.username }}
+                {% if notificacao.remetente %}{{ notificacao.remetente.get_full_name|default:notificacao.remetente.username }}{% else %}equipe do NAPNE{% endif %}
                 em {{ notificacao.criado_em|date:"d/m/Y H:i" }}
             </p>
             <p>{{ notificacao.conteudo }}</p>
