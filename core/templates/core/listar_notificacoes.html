@@ -1,0 +1,62 @@
+{% extends "painel_base.html" %}
+
+{% block page_title %}Notificações{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item active">Notificações</li>
+{% endblock %}
+
+{% block content %}
+
+    {% component "adminlte_card" title="Notificações enviadas" icon="bi bi-bell" theme="primary" %}
+
+        {% fill "default" %}
+        <a href="{% url 'criar_notificacao' %}" class="btn btn-primary mb-3">
+            <i class="bi bi-plus-circle"></i> Nova notificação
+        </a>
+
+        {% if notificacoes %}
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>Título</th>
+                    <th>Destino</th>
+                    <th>Enviado por</th>
+                    <th>Data</th>
+                    <th class="text-end">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for notificacao in notificacoes %}
+                <tr>
+                    <td>{{ notificacao.titulo }}</td>
+                    <td>
+                        {{ notificacao.get_destino_tipo_display }}
+                        {% if notificacao.destino_tipo == "usuario" and notificacao.destinatario %}
+                            — {{ notificacao.destinatario.get_full_name|default:notificacao.destinatario.username }}
+                        {% endif %}
+                    </td>
+                    <td>{% if notificacao.remetente %}{{ notificacao.remetente.get_full_name|default:notificacao.remetente.username }}{% else %}<span class="text-muted">Usuário removido</span>{% endif %}</td>
+                    <td>{{ notificacao.criado_em|date:"d/m/Y H:i" }}</td>
+                    <td class="text-end">
+                        <a href="{% url 'editar_notificacao' notificacao.id %}" class="btn btn-sm btn-warning">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <a href="{% url 'excluir_notificacao' notificacao.id %}" class="btn btn-sm btn-danger">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+            {% component "adminlte_callout" theme="info" title="Nenhuma notificação" %}
+                Nenhuma notificação foi enviada ainda.
+            {% endcomponent %}
+        {% endif %}
+        {% endfill %}
+
+    {% endcomponent %}
+
+{% endblock %}

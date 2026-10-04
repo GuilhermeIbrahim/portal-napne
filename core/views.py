@@ -5,8 +5,8 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 
 from .decorators import napne_required
-from .forms import ApresentacaoNapneForm, ImagemCarrosselFormSet,NoticiaForm, PeiForm
-from .models import ApresentacaoNapne, FeedbackPrivado, Noticia, Pei, SolicitacaoNapne
+from .forms import ApresentacaoNapneForm, ImagemCarrosselFormSet, NoticiaForm, NotificacaoForm, PeiForm
+from .models import ApresentacaoNapne, FeedbackPrivado, Noticia, Notificacao, Pei, SolicitacaoNapne
 
 
 @napne_required
@@ -138,3 +138,49 @@ def editar_apresentacao_napne(request):
         form = ApresentacaoNapneForm(instance=apresentacao)
         formset = ImagemCarrosselFormSet(instance=apresentacao)
     return render(request, 'core/editar_apresentacao_napne.html', {'form': form, 'formset': formset})
+
+
+@napne_required
+def listar_notificacoes(request):
+    notificacoes = Notificacao.objects.all()
+    context = {'notificacoes': notificacoes}
+    return render(request, 'core/listar_notificacoes.html', context)
+
+
+@napne_required
+def criar_notificacao(request):
+    if request.method == 'POST':
+        form = NotificacaoForm(request.POST)
+        if form.is_valid():
+            notificacao = form.save(commit=False)
+            notificacao.remetente = request.user
+            notificacao.save()
+            messages.success(request, 'Notificação enviada com sucesso!')
+            return redirect('listar_notificacoes')
+    else:
+        form = NotificacaoForm()
+    return render(request, 'core/criar_notificacao.html', {'form': form})
+
+
+@napne_required
+def editar_notificacao(request, id):
+    notificacao = get_object_or_404(Notificacao, id=id)
+    if request.method == 'POST':
+        form = NotificacaoForm(request.POST, instance=notificacao)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Notificação atualizada com sucesso!')
+            return redirect('listar_notificacoes')
+    else:
+        form = NotificacaoForm(instance=notificacao)
+    return render(request, 'core/editar_notificacao.html', {'form': form, 'notificacao': notificacao})
+
+
+@napne_required
+def excluir_notificacao(request, id):
+    notificacao = get_object_or_404(Notificacao, id=id)
+    if request.method == 'POST':
+        notificacao.delete()
+        messages.success(request, 'Notificação excluída com sucesso!')
+        return redirect('listar_notificacoes')
+    return render(request, 'core/excluir_notificacao.html', {'notificacao': notificacao})

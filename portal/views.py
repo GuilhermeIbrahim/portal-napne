@@ -1,15 +1,30 @@
 from django.contrib import messages
 from django.contrib.auth import login as auth_login
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
 from django.db.models import Q
-from django.http import JsonResponse, request
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 
 from core.decorators import professor_required
-from core.forms import CadastroNapneForm, LoginNapneForm, PeiForm, FeedbackPublicoForm, FeedbackPrivadoForm
-from core.models import ApresentacaoNapne, FeedbackPrivado, FeedbackPublico, Noticia, SolicitacaoNapne
+from core.forms import (
+    CadastroNapneForm,
+    FeedbackPrivadoForm,
+    FeedbackPublicoForm,
+    LoginNapneForm,
+    PeiForm,
+)
+from core.models import (
+    ApresentacaoNapne,
+    FeedbackPrivado,
+    FeedbackPublico,
+    Noticia,
+    Notificacao,
+    SolicitacaoNapne,
+)
 
 
 def index(request):
@@ -18,7 +33,10 @@ def index(request):
     num_pag = request.GET.get('page')
     page = paginator.get_page(num_pag)
     elided = paginator.get_elided_page_range(number=page.number, on_each_side=2, on_ends=2)
-    context = {'noticias': page, 'elided': elided}
+
+    notificacoes_nao_lidas = Notificacao.nao_lidas_para(request.user)
+
+    context = {'noticias': page, 'elided': elided, 'notificacoes_nao_lidas': notificacoes_nao_lidas}
     return render(request, "portal/index.html", context) 
 
 def detalhe(request, id):
@@ -208,3 +226,23 @@ def apresentacao_napne(request):
     apresentacao = ApresentacaoNapne.obter_instancia()
     context = {'apresentacao': apresentacao}
     return render(request, 'portal/apresentacao_napne.html', context)
+
+@login_required
+def detalhar_notificacao(request, id):
+    notificacao = get_object_or_404(Notificacao, id=id)
+
+    if not notificacao.visivel_para(request.user):
+        raise PermissionDenied("Esta notificação não é destinada a você.")
+
+    notificacao.lida_por.add(request.user)
+
+    context = {'notificacao': notificacao}
+    return render(request, 'portal/detalhar_notificacao.html', context)
+
+
+@login_required
+def minhas_notificacoes(request):
+    notificacoes = Notificacao.para_usuario(request.user)
+    lidas_ids = set(request.user.notificacoes_lidas.values_list('id', flat=True))
+    context = {'notificacoes': notificacoes, 'lidas_ids': lidas_ids}
+    return render(request, 'portal/minhas_notificacoes.html', context)

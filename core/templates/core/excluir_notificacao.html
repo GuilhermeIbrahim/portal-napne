@@ -1,0 +1,28 @@
+{% extends "painel_base.html" %}
+
+{% block page_title %}Excluir notificação{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{% url 'listar_notificacoes' %}">Notificações</a></li>
+    <li class="breadcrumb-item active">Excluir</li>
+{% endblock %}
+
+{% block content %}
+
+    {% component "adminlte_card" title="Confirmar exclusão" icon="bi bi-exclamation-triangle" theme="danger" %}
+
+        {% component "adminlte_alert" theme="danger" icon="bi bi-exclamation-triangle" %}
+            Tem certeza que deseja excluir a notificação <strong>"{{ notificacao.titulo }}"</strong>? Essa ação não pode ser desfeita.
+        {% endcomponent %}
+
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">
+                <i class="bi bi-trash"></i> Sim, excluir
+            </button>
+            <a href="{% url 'listar_notificacoes' %}" class="btn btn-secondary">Cancelar</a>
+        </form>
+
+    {% endcomponent %}
+
+{% endblock %}

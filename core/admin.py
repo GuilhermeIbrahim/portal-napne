@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from .models import Noticia, Pei, SolicitacaoNapne, Usuario, FeedbackPublico, FeedbackPrivado
+from .models import Noticia, Pei, SolicitacaoNapne, Usuario, FeedbackPublico, FeedbackPrivado, Notificacao
 
 admin.site.register(Usuario, UserAdmin)
 
@@ -34,3 +34,9 @@ class FeedbackPrivadoAdmin(admin.ModelAdmin):
     list_display = ('noticia', 'autor', 'data')
     list_filter = ('data',)
     search_fields = ('noticia__titulo', 'autor__username', 'autor__first_name', 'autor__last_name')
+
+@admin.register(Notificacao)
+class NotificacaoAdmin(admin.ModelAdmin):
+    list_display = ('titulo', 'destino_tipo', 'destinatario', 'remetente', 'criado_em')
+    list_filter = ('destino_tipo', 'criado_em')
+    search_fields = ('titulo', 'conteudo')
