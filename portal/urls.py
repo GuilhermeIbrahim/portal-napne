@@ -17,4 +17,6 @@ urlpatterns = [
     path('detalhar-feedback-privado/<int:feedback_id>/', views.detalhar_feedback_privado, name='detalhar_feedback_privado'),
     path('detalhar-feedback-publico/<int:feedback_id>/', views.detalhar_feedback_publico, name='detalhar_feedback_publico'),
     path('sobre/', views.apresentacao_napne, name='apresentacao_napne'),
+    path('notificacao/<int:id>/', views.detalhar_notificacao, name='detalhar_notificacao'),
+    path('minhas-notificacoes/', views.minhas_notificacoes, name='minhas_notificacoes'),
 ]
