@@ -11,6 +11,7 @@ from .models import (
     FeedbackPublico,
     ImagemCarrossel,
     Noticia,
+    Notificacao,
     Pei,
 )
 
@@ -208,3 +209,47 @@ ImagemCarrosselFormSet = inlineformset_factory(
         extra=3,
         can_delete=True,
 )
+
+
+class NotificacaoForm(forms.ModelForm):
+    class Meta:
+        model = Notificacao
+        fields = ["titulo", "conteudo", "destino_tipo", "destinatario"]
+        labels = {
+            "titulo": "Título",
+            "conteudo": "Mensagem",
+            "destino_tipo": "Enviar para",
+            "destinatario": "Usuário específico",
+        }
+        widgets = {
+            "titulo": forms.TextInput(attrs={"placeholder": "Título da notificação"}),
+            "conteudo": forms.Textarea(attrs={"rows": 4, "placeholder": "Escreva a mensagem..."}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields["destinatario"].queryset = get_user_model().objects.all().order_by("first_name", "username")
+        self.fields["destinatario"].required = False
+
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.layout = Layout(
+            Field("titulo"),
+            Field("destino_tipo", css_id="id_destino_tipo"),
+            Div(Field("destinatario"), css_id="div_destinatario"),
+            Field("conteudo"),
+        )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        destino_tipo = cleaned_data.get("destino_tipo")
+        destinatario = cleaned_data.get("destinatario")
+
+        if destino_tipo == Notificacao.USUARIO and not destinatario:
+            self.add_error("destinatario", "Escolha o usuário que vai receber esta notificação.")
+
+        if destino_tipo != Notificacao.USUARIO:
+            cleaned_data["destinatario"] = None
+
+        return cleaned_data
