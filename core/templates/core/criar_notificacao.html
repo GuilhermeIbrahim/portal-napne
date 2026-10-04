@@ -1,0 +1,49 @@
+{% extends "painel_base.html" %}
+{% load crispy_forms_tags %}
+
+{% block page_title %}Nova notificação{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{% url 'listar_notificacoes' %}">Notificações</a></li>
+    <li class="breadcrumb-item active">Nova</li>
+{% endblock %}
+
+{% block content %}
+
+    {% component "adminlte_card" title="Nova notificação" icon="bi bi-bell" theme="primary" %}
+
+        <form method="post">
+            {% csrf_token %}
+            {% crispy form form.helper %}
+            <div class="mt-3">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-send"></i> Enviar
+                </button>
+                <a href="{% url 'listar_notificacoes' %}" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+
+    {% endcomponent %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Mostra o campo "destinatário" só quando o destino escolhido for "Um usuário específico".
+    const campoDestino = document.getElementById('id_destino_tipo');
+    const divDestinatario = document.getElementById('div_destinatario');
+
+    function atualizarVisibilidadeDestinatario() {
+        if (campoDestino.value === 'usuario') {
+            divDestinatario.classList.remove('d-none');
+        } else {
+            divDestinatario.classList.add('d-none');
+        }
+    }
+
+    if (campoDestino && divDestinatario) {
+        atualizarVisibilidadeDestinatario();
+        campoDestino.addEventListener('change', atualizarVisibilidadeDestinatario);
+    }
+</script>
+{% endblock %}
