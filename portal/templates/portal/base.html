@@ -41,6 +41,10 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'minhas_notificacoes' %}">
                                 <i class="bi bi-bell"></i> Notificações
+                                <span id="selo-notificacoes" class="badge rounded-pill text-bg-warning ms-1 d-none">
+                                    <span class="selo-valor"></span>
+                                    <span class="visually-hidden">notificações não lidas</span>
+                                </span>
                             </a>
                         </li>
                         <li class="nav-item">
@@ -126,6 +130,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{% static 'js/confirmar-acao.js' %}"></script>
     <script src="{% static 'js/logo-fallback.js' %}"></script>
+    {% include "partials/_notificacoes_ao_vivo.html" %}
     {% block extra_js %}{% endblock %}
 </body>
 </html>
