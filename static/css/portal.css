@@ -146,12 +146,12 @@
     box-shadow: 0 0.6rem 1.2rem rgba(78, 31, 77, 0.15) !important;
 }
 
-/* Cada card de notícia recebe uma cor da logo, em sequência */
-#lista-noticias > div:nth-child(6n + 2) .card-noticia { --cor-card: var(--napne-vermelho); }
-#lista-noticias > div:nth-child(6n + 3) .card-noticia { --cor-card: var(--napne-laranja); }
-#lista-noticias > div:nth-child(6n + 4) .card-noticia { --cor-card: var(--napne-amarelo); }
-#lista-noticias > div:nth-child(6n + 5) .card-noticia { --cor-card: var(--napne-verde); }
-#lista-noticias > div:nth-child(6n + 6) .card-noticia { --cor-card: var(--napne-azul); }
+/* Cada notícia recebe sempre a mesma cor da logo (id % 6), mesmo quando novos cards entram no topo */
+.card-noticia[data-cor="1"] { --cor-card: var(--napne-vermelho); }
+.card-noticia[data-cor="2"] { --cor-card: var(--napne-laranja); }
+.card-noticia[data-cor="3"] { --cor-card: var(--napne-amarelo); }
+.card-noticia[data-cor="4"] { --cor-card: var(--napne-verde); }
+.card-noticia[data-cor="5"] { --cor-card: var(--napne-azul); }
 
 .noticia-card-img {
     height: 180px;

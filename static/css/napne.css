@@ -407,3 +407,182 @@ label {
     position: relative;
     z-index: 2;
 }
+
+/* --------------------------------------------------------------------------
+   Atualização ao vivo: caixas de notificação, avisos e destaques
+   -------------------------------------------------------------------------- */
+
+/* Usada por js/ao-vivo.js durante a inserção, para a rolagem não ser compensada duas vezes */
+html.sem-ancora-rolagem {
+    overflow-anchor: none;
+}
+
+/* Caixas de notificação no topo da tela (qualquer página, usuário logado) */
+.area-toasts {
+    --toast-duracao: 8s;
+    position: fixed;
+    top: 0.75rem;
+    left: 50%;
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: min(30rem, calc(100vw - 1.5rem));
+    transform: translateX(-50%);
+    pointer-events: none;   /* só as caixas recebem cliques; o resto da tela continua clicável */
+}
+
+.toast-napne {
+    position: relative;
+    overflow: hidden;
+    pointer-events: auto;
+    border-left: 6px solid var(--napne-roxo);
+    border-radius: 0.75rem;
+    background-color: #fff;
+    box-shadow: 0 0.75rem 1.75rem rgba(78, 31, 77, 0.28);
+    animation: toast-napne-entrada 0.3s ease-out;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.toast-napne--saindo {
+    opacity: 0;
+    transform: translateY(-0.75rem);
+}
+
+.toast-napne__link {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.9rem 2.75rem 1.2rem 0.9rem;
+    color: var(--bs-body-color);
+    text-decoration: none;
+}
+
+.toast-napne__link:hover .toast-napne__titulo {
+    text-decoration: underline;
+}
+
+.toast-napne__icone {
+    display: grid;
+    flex: 0 0 2.25rem;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    background-color: var(--bs-primary-bg-subtle);
+    color: var(--napne-roxo);
+}
+
+.toast-napne__texto {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.toast-napne__titulo {
+    font-family: var(--napne-fonte-titulo);
+    color: var(--napne-roxo-profundo);
+    overflow-wrap: anywhere;
+}
+
+.toast-napne__trecho {
+    display: -webkit-box;
+    overflow: hidden;
+    font-size: 0.9rem;
+    color: var(--bs-secondary-color);
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.toast-napne__fechar {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--bs-secondary-color);
+}
+
+.toast-napne__fechar:hover {
+    background-color: var(--bs-primary-bg-subtle);
+    color: var(--napne-roxo-profundo);
+}
+
+/* Barra de tempo: revela a faixa colorida da esquerda para a direita; no fim a caixa some */
+.toast-napne__barra {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 5px;
+    background: var(--napne-faixa);
+    clip-path: inset(0 100% 0 0);
+    animation: toast-napne-barra var(--toast-duracao) linear forwards;
+}
+
+/* Passar o mouse ou usar o teclado dentro da caixa pausa a contagem (tempo para ler) */
+.toast-napne:hover .toast-napne__barra,
+.toast-napne:focus-within .toast-napne__barra {
+    animation-play-state: paused;
+}
+
+@keyframes toast-napne-entrada {
+    from { opacity: 0; transform: translateY(-1rem); }
+}
+
+@keyframes toast-napne-barra {
+    to { clip-path: inset(0 0 0 0); }
+}
+
+/* Com "reduzir movimento" a barra continua contando o tempo, mas em passos discretos */
+@media (prefers-reduced-motion: reduce) {
+    .toast-napne__barra {
+        animation-duration: var(--toast-duracao) !important;
+        animation-timing-function: steps(16, end) !important;
+        animation-iteration-count: 1 !important;
+    }
+}
+
+/* Aviso flutuante "N novas notícias" */
+.aviso-novas {
+    position: fixed;
+    bottom: 1.25rem;
+    left: 50%;
+    z-index: 1900;
+    transform: translateX(-50%);
+}
+
+.aviso-novas .btn {
+    border-radius: 50rem;
+}
+
+/* Destaque do que acabou de chegar */
+.selo-novo {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    z-index: 2;
+}
+
+.noticia-nova .card-noticia {
+    outline: 4px solid transparent;
+    outline-offset: 2px;
+    animation: destaque-novo 6s ease-out;
+}
+
+.item-novo {
+    animation: destaque-item 6s ease-out;
+}
+
+@keyframes destaque-novo {
+    from { outline-color: var(--napne-amarelo); }
+}
+
+@keyframes destaque-item {
+    from { background-color: var(--bs-warning-bg-subtle); }
+}
