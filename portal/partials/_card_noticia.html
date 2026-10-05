@@ -1,0 +1,17 @@
+{% load portal_extras %}
+<div class="col-md-6 col-lg-4 mb-4{% if novo %} noticia-nova{% endif %}" data-noticia-id="{{ noticia.id }}">
+    <div class="card card-noticia h-100 shadow-sm" data-cor="{{ noticia.id|resto:6 }}">
+        {% if novo %}<span class="badge text-bg-warning selo-novo">Novo</span>{% endif %}
+        {% if noticia.imagem %}
+            <img src="{{ noticia.imagem.url }}" class="card-img-top noticia-card-img" alt="">
+        {% endif %}
+        <div class="card-body d-flex flex-column">
+            <h2 class="h5 card-title">{{ noticia.titulo }}</h2>
+            <p class="card-text text-muted small">{{ noticia.data }}</p>
+            <p class="card-text flex-grow-1">{{ noticia.conteudo|striptags|truncatewords:20 }}</p>
+            <a href="{% url 'detalhe' noticia.id %}" class="btn btn-outline-primary btn-sm align-self-start">
+                Ler mais
+            </a>
+        </div>
+    </div>
+</div>
