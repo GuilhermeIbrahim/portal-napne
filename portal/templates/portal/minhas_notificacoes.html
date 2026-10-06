@@ -6,26 +6,14 @@
 
     <h1 class="h3 mb-4">Minhas notificações</h1>
 
-    {% if notificacoes %}
-        <div class="list-group">
-            {% for notificacao in notificacoes %}
-                <a href="{% url 'detalhar_notificacao' notificacao.id %}"
-                   class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                    <span>
-                        <i class="bi bi-bell{% if notificacao.id not in lidas_ids %}-fill{% endif %}"></i>
-                        <strong>{{ notificacao.titulo }}</strong>
-                        — {{ notificacao.conteudo|truncatewords:15 }}
-                        <br>
-                        <small class="text-muted">{{ notificacao.criado_em|date:"d/m/Y H:i" }}</small>
-                    </span>
-                    {% if notificacao.id not in lidas_ids %}
-                        <span class="badge text-bg-primary">Nova</span>
-                    {% endif %}
-                </a>
-            {% endfor %}
-        </div>
-    {% else %}
+    <div id="aviso-sem-notificacoes"{% if notificacoes %} class="d-none"{% endif %}>
         <div class="alert alert-info">Você ainda não recebeu nenhuma notificação.</div>
-    {% endif %}
+    </div>
+
+    <div class="list-group" id="lista-notificacoes">
+        {% for notificacao in notificacoes %}
+            {% include "portal/partials/_item_notificacao.html" %}
+        {% endfor %}
+    </div>
 
 {% endblock %}

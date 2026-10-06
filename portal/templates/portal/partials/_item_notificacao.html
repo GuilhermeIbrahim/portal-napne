@@ -1,0 +1,14 @@
+<a href="{% url 'detalhar_notificacao' notificacao.id %}"
+   class="list-group-item list-group-item-action d-flex justify-content-between align-items-center{% if novo %} item-novo{% endif %}"
+   data-notificacao-id="{{ notificacao.id }}">
+    <span>
+        <i class="bi bi-bell{% if notificacao.nao_lida %}-fill{% endif %}"></i>
+        <strong>{{ notificacao.titulo }}</strong>
+        — {{ notificacao.conteudo|truncatewords:15 }}
+        <br>
+        <small class="text-muted">{{ notificacao.criado_em|date:"d/m/Y H:i" }}</small>
+    </span>
+    {% if notificacao.nao_lida %}
+        <span class="badge text-bg-primary">Nova</span>
+    {% endif %}
+</a>

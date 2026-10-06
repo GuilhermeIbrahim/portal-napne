@@ -1,5 +1,5 @@
 {% extends "painel_base.html" %}
-{% load crispy_forms_tags %}
+{% load static crispy_forms_tags %}
 
 {% block page_title %}Editar notificação{% endblock %}
 
@@ -28,21 +28,7 @@
 {% endblock %}
 
 {% block extra_js %}
-<script>
-    const campoDestino = document.getElementById('id_destino_tipo');
-    const divDestinatario = document.getElementById('div_destinatario');
-
-    function atualizarVisibilidadeDestinatario() {
-        if (campoDestino.value === 'usuario') {
-            divDestinatario.classList.remove('d-none');
-        } else {
-            divDestinatario.classList.add('d-none');
-        }
-    }
-
-    if (campoDestino && divDestinatario) {
-        atualizarVisibilidadeDestinatario();
-        campoDestino.addEventListener('change', atualizarVisibilidadeDestinatario);
-    }
-</script>
+    {% block painel_js %}
+        <script src="{% static 'js/destino-notificacao.js' %}"></script>
+    {% endblock %}
 {% endblock %}

@@ -1,0 +1,10 @@
+{% load static %}
+{% if user.is_authenticated %}
+    <div id="area-toasts" class="area-toasts" role="region" aria-label="Novas notificações" aria-live="polite"
+         data-url="{% url 'api_notificacoes_novas' %}"
+         data-url-lista="{% url 'minhas_notificacoes' %}"
+         data-usuario="{{ user.pk }}"
+         data-intervalo="20"></div>
+    <script src="{% static 'js/ao-vivo.js' %}"></script>
+    <script src="{% static 'js/notificacoes-ao-vivo.js' %}"></script>
+{% endif %}

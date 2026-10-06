@@ -14,5 +14,6 @@
 {% block extra_js %}
     <script src="{% static 'js/confirmar-acao.js' %}"></script>
     <script src="{% static 'js/logo-fallback.js' %}"></script>
+    {% include "partials/_notificacoes_ao_vivo.html" %}
     {% block painel_js %}{% endblock %}
 {% endblock %}

@@ -24,7 +24,7 @@ def criar_noticia(request):
         form = NoticiaForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
-            return redirect('index')
+            return redirect('painel_home')
     else:
         form = NoticiaForm()
     return render(request, 'core/criar_noticia.html', {'form': form})
@@ -46,7 +46,7 @@ def excluir_noticia(request, id):
     noticia = get_object_or_404(Noticia, id=id)
     if request.method == 'POST':
         noticia.delete()
-        return redirect('index')
+        return redirect('painel_home')
     return render(request, 'core/excluir_noticia.html', {'noticia': noticia})
 
 @napne_required

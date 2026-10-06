@@ -3,11 +3,16 @@ from django.contrib.auth import login as auth_login
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
-from django.db.models import Q
+from django.db.models import Q, Max
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+from django.utils.text import Truncator
+from django.views.decorators.cache import never_cache
+from django.views.decorators.http import require_GET
 
 from core.decorators import professor_required
 from core.forms import (
@@ -28,7 +33,8 @@ from core.models import (
 
 
 def index(request):
-    noticias = Noticia.objects.all().order_by('-data')
+    ultimo_noticia_id = Noticia.objects.aggregate(ultimo=Max('id'))['ultimo'] or 0
+    noticias = Noticia.objects.all().order_by('-data', '-id')
     paginator = Paginator(noticias, 9)  
     num_pag = request.GET.get('page')
     page = paginator.get_page(num_pag)
@@ -36,7 +42,7 @@ def index(request):
 
     notificacoes_nao_lidas = Notificacao.nao_lidas_para(request.user)
 
-    context = {'noticias': page, 'elided': elided, 'notificacoes_nao_lidas': notificacoes_nao_lidas}
+    context = {'noticias': page, 'elided': elided, 'notificacoes_nao_lidas': notificacoes_nao_lidas, 'ultimo_noticia_id': ultimo_noticia_id}
     return render(request, "portal/index.html", context) 
 
 def detalhe(request, id):
@@ -60,7 +66,7 @@ def enviar_pei(request):
     return render(request, 'portal/enviar_pei.html', {'form': form})
 
 def pesquisar_noticias(request):
-    termo = request.GET.get('q', '')
+    termo = request.GET.get('q', '').strip()
     resultados = []
     if termo:
         noticias = Noticia.objects.filter(Q(titulo__icontains=termo) | Q(conteudo__icontains=termo))
@@ -70,7 +76,7 @@ def pesquisar_noticias(request):
                 'titulo': noticia.titulo,
                 'url': reverse('detalhe', args=[noticia.id]),
             })
-        return JsonResponse({'resultados': resultados})
+    return JsonResponse({'resultados': resultados})
 
 def cadastro_napne(request):
     if request.user.is_authenticated:
@@ -242,7 +248,105 @@ def detalhar_notificacao(request, id):
 
 @login_required
 def minhas_notificacoes(request):
-    notificacoes = Notificacao.para_usuario(request.user)
+    notificacoes = list(Notificacao.para_usuario(request.user))
     lidas_ids = set(request.user.notificacoes_lidas.values_list('id', flat=True))
-    context = {'notificacoes': notificacoes, 'lidas_ids': lidas_ids}
-    return render(request, 'portal/minhas_notificacoes.html', context)
+    for notificacao in notificacoes:
+        notificacao.nao_lida = notificacao.id not in lidas_ids
+    return render(request, 'portal/minhas_notificacoes.html', {'notificacoes': notificacoes})
+
+# ---------------------------------------------------------------------------
+# Atualização automática (AJAX com polling)
+# ---------------------------------------------------------------------------
+LIMITE_NOTICIAS_POR_CONSULTA = 12
+LIMITE_NOTIFICACOES_TOAST = 5
+LIMITE_NOTIFICACOES_LISTA = 20
+TAMANHO_TRECHO_NOTIFICACAO = 120
+
+
+def _trecho(texto):
+    limpo = ''.join(strip_tags(texto or '').split())
+    return Truncator(limpo).chars(TAMANHO_TRECHO_NOTIFICACAO).strip()
+
+def _ler_desde(request):
+    bruto = request.GET.get('desde')
+    if bruto in (None, ''):
+        return None
+    valor = int(bruto)
+    if valor < 0:
+        raise ValueError('desde negativo')
+    return valor
+
+
+@require_GET
+@never_cache
+def api_noticias_novas(request):
+    try:
+        desde = _ler_desde(request)
+    except ValueError:
+        return JsonResponse({'erro': 'Parâmetro "desde" inválido.'}, status=400)
+
+    ultimo_id = Noticia.objects.aggregate(ultimo=Max('id'))['ultimo'] or 0
+
+    if desde is None:
+        return JsonResponse({'ultimo_id': ultimo_id, 'total': 0, 'html': ''})
+
+    novas = Noticia.objects.filter(id__gt=desde)
+    total = novas.count()
+    cards = [
+        render_to_string('portal/partials/_card_noticia.html', {'noticia': noticia, 'novo': True}, request=request)
+        for noticia in novas.order_by('-id')[:LIMITE_NOTICIAS_POR_CONSULTA]
+    ]
+    return JsonResponse({'ultimo_id': ultimo_id, 'total': total, 'html': ''.join(cards)})
+
+
+@require_GET
+@never_cache
+def api_notificacoes_novas(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({'erro': 'Faça login para ver suas notificações.'}, status=401)
+
+    try:
+        desde = _ler_desde(request)
+    except ValueError:
+        return JsonResponse({'erro': 'Parâmetro "desde" inválido.'}, status=400)
+
+    visiveis = Notificacao.para_usuario(request.user)
+    nao_lidas = Notificacao.nao_lidas_para(request.user)
+
+    resposta = {
+        'ultimo_id': visiveis.aggregate(ultimo=Max('id'))['ultimo'] or 0,
+        'nao_lidas': nao_lidas.count(),
+        'total_novas': 0,
+        'novas': [],
+        'html': '',
+    }
+
+    if desde is None:
+        return JsonResponse(resposta)
+
+    novas_qs = nao_lidas.filter(id__gt=desde)
+    resposta['total_novas'] = novas_qs.count()
+    novas = list(novas_qs.order_by('id')[:LIMITE_NOTIFICACOES_LISTA])
+
+    resposta['novas'] = [
+        {
+            'id': notificacao.id,
+            'titulo': notificacao.titulo,
+            'trecho': _trecho(notificacao.conteudo),
+            'url': reverse('detalhar_notificacao', args=[notificacao.id]),
+        }
+        for notificacao in novas[:LIMITE_NOTIFICACOES_TOAST]
+    ]
+
+    if request.GET.get('lista') == '1':
+        itens = []
+        for notificacao in reversed(novas):  
+            notificacao.nao_lida = True
+            itens.append(render_to_string(
+                'portal/partials/_item_notificacao.html',
+                {'notificacao': notificacao, 'novo': True},
+                request=request,
+            ))
+        resposta['html'] = ''.join(itens)
+
+    return JsonResponse(resposta)

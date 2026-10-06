@@ -22,25 +22,19 @@
         <div id="sugestoes-pesquisa" class="list-group position-absolute w-100 shadow-sm d-none sugestoes-pesquisa"></div>
     </div>
 
-    <div class="row" id="lista-noticias">
+        <div id="aviso-novas-noticias" class="aviso-novas d-none" role="status"></div>
+    <p id="anuncio-noticias" class="visually-hidden" aria-live="polite"></p>
+
+    <div class="row" id="lista-noticias"
+         data-url-novas="{% url 'api_noticias_novas' %}"
+         data-ultimo-id="{{ ultimo_noticia_id }}"
+         data-pagina="{{ noticias.number }}"
+         data-url-inicio="{% url 'index' %}"
+         data-intervalo="30">
         {% for noticia in noticias %}
-            <div class="col-md-6 col-lg-4 mb-4">
-                <div class="card card-noticia h-100 shadow-sm">
-                    {% if noticia.imagem %}
-                        <img src="{{ noticia.imagem.url }}" class="card-img-top noticia-card-img" alt="">
-                    {% endif %}
-                    <div class="card-body d-flex flex-column">
-                        <h2 class="h5 card-title">{{ noticia.titulo }}</h2>
-                        <p class="card-text text-muted small">{{ noticia.data }}</p>
-                        <p class="card-text flex-grow-1">{{ noticia.conteudo|striptags|truncatewords:20 }}</p>
-                        <a href="{% url 'detalhe' noticia.id %}" class="btn btn-outline-primary btn-sm align-self-start">
-                            Ler mais
-                        </a>
-                    </div>
-                </div>
-            </div>
+            {% include "portal/partials/_card_noticia.html" %}
         {% empty %}
-            <div class="col-12">
+            <div class="col-12" id="aviso-sem-noticias">
                 <div class="alert alert-info">Nenhuma notícia publicada ainda.</div>
             </div>
         {% endfor %}
@@ -94,4 +88,6 @@
 
 {% block extra_js %}
 <script src="{% static 'js/pesquisa-noticias.js' %}"></script>
+<script src="{% static 'js/ao-vivo.js' %}"></script>
+<script src="{% static 'js/noticias-ao-vivo.js' %}"></script>
 {% endblock %}
