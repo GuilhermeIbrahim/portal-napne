@@ -263,6 +263,10 @@ LIMITE_NOTIFICACOES_LISTA = 20
 TAMANHO_TRECHO_NOTIFICACAO = 120
 
 
+def _trecho(texto):
+    limpo = ''.join(strip_tags(texto or '').split())
+    return Truncator(limpo).chars(TAMANHO_TRECHO_NOTIFICACAO).strip()
+
 def _ler_desde(request):
     bruto = request.GET.get('desde')
     if bruto in (None, ''):
@@ -328,7 +332,7 @@ def api_notificacoes_novas(request):
         {
             'id': notificacao.id,
             'titulo': notificacao.titulo,
-            'trecho': Truncator(strip_tags(notificacao.conteudo)).chars(TAMANHO_TRECHO_NOTIFICACAO),
+            'trecho': _trecho(notificacao.conteudo),
             'url': reverse('detalhar_notificacao', args=[notificacao.id]),
         }
         for notificacao in novas[:LIMITE_NOTIFICACOES_TOAST]

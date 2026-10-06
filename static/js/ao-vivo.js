@@ -1,6 +1,10 @@
 (function () {
     'use strict';
 
+    if (window.NapneAoVivo) {
+        return;
+    }
+
     var INTERVALO_MAXIMO_MS = 5 * 60 * 1000;
     var ESPERA_MINIMA_AO_VOLTAR_MS = 5 * 1000;
 
