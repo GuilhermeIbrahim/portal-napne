@@ -13,6 +13,7 @@ from .models import (
     Noticia,
     Notificacao,
     Pei,
+    HistoricoPei
 )
 
 
@@ -63,6 +64,24 @@ class PeiForm(forms.ModelForm):
             Field("arquivo"),
         )
 
+class AlterarStatusPeiForm(forms.Form):
+    status = forms.ChoiceField(choices=Pei.STATUS_CHOICES, label="Novo status")
+    observacao = forms.CharField(
+        label="Observação (opcional)",
+        required=False,
+        widget=forms.Textarea(attrs={"rows": 3, "placeholder": "Explique o motivo da mudança de status, se necessário"}),
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.layout = Layout(
+            Field("status"),
+            Field("observacao"),
+        )
+  
 
 class CadastroNapneForm(UserCreationForm):
     first_name = forms.CharField(
