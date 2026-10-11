@@ -202,6 +202,7 @@ ADMINLTE = {
     {"text": "Notificações", "route": "listar_notificacoes", "icon": "bi bi-bell"},
     {"text": "Apresentação do NAPNE", "route": "editar_apresentacao_napne", "icon": "bi bi-easel"},
     {"text": "Ver site público", "route": "index", "icon": "bi bi-box-arrow-up-right"},
+    {"text": "Histórico de PEIs", "route": "listar_historico_peis", "icon": "bi bi-clock-history"},
     ],
     "usermenu_enabled": True,
     "navbar_search": False,
