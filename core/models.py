@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models import Q
 from django_ckeditor_5.fields import CKEditor5Field
+from django.urls import reverse
 
 
 class Usuario(AbstractUser):
@@ -23,8 +24,81 @@ class Pei(models.Model):
     data_envio = models.DateField(auto_now_add=True)
     professor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
+    EM_ANALISE = "em_analise"
+    ANALISADO = "analizado"
+    DEVOLVIDO = "devolvido"
+
+    STATUS_CHOICES = [
+        (EM_ANALISE, "Em análise"),
+        (ANALISADO, "Analisado"),
+        (DEVOLVIDO, "Devolvido"),
+    ]
+
+    STATUS_BADGE = {
+        EM_ANALISE : "warning",
+        ANALISADO : "success",
+        DEVOLVIDO : "danger",
+    }
+
+    def badge_theme(self):
+        return self.STATUS_BADGE.get(self.status, "secondary")
+
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=EM_ANALISE)
+
     def __str__(self):
         return self.titulo 
+
+    def alterar_status(self, novo_status, alterado_por, observacao="", request=None):
+        if novo_status == self.status:
+            return None
+
+        status_anterior = self.status
+        self.status = novo_status
+        self.save(update_fields=["status"])
+
+        historico = HistoricoPei.objects.create(
+            pei=self,
+            status_anterior=status_anterior,
+            status_novo=novo_status,
+            alterado_por=alterado_por,
+            observacao=observacao,
+        )
+
+        caminho_pei = reverse("detalhar_meu_pei", args=[self.id])
+        link_pei = request.build_absolute_uri(caminho_pei) if request else caminho_pei
+
+        Notificacao.objects.create(
+            titulo=f"O status do PEI '{self.titulo}' foi alterado para '{self.get_status_display()}'",
+            conteudo=(
+                f"O status do PEI '{self.titulo}' foi alterado para "
+                f"'{self.get_status_display()}'. Acesse: {link_pei}"
+            ),
+            destino_tipo=Notificacao.USUARIO,
+            destinatario=self.professor,
+            remetente=alterado_por,
+        )
+
+        return historico
+
+class HistoricoPei(models.Model):
+    pei = models.ForeignKey(Pei, on_delete=models.CASCADE, related_name="historico")
+    status_anterior = models.CharField(max_length=20, choices=Pei.STATUS_CHOICES)
+    status_novo = models.CharField(max_length=20, choices=Pei.STATUS_CHOICES)
+    alterado_por = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True,)
+    observacao = models.TextField(blank=True)
+    alterado_em = models.DateTimeField(auto_now_add=True)
+
+    def badge_anterior_theme(self):
+        return Pei.STATUS_BADGE.get(self.status_anterior, "secondary")
+
+    def badge_novo_theme(self):
+        return Pei.STATUS_BADGE.get(self.status_novo, "secondary")
+
+    class Meta:
+        ordering = ["alterado_em"]
+
+    def __str__(self):
+        return f"{self.pei.titulo}: {self.status_anterior} → {self.status_novo}"
     
 class SolicitacaoNapne(models.Model):
     PENDENTE = "pendente"
