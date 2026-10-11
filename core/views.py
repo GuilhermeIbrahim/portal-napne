@@ -5,8 +5,8 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 
 from .decorators import napne_required
-from .forms import ApresentacaoNapneForm, ImagemCarrosselFormSet, NoticiaForm, NotificacaoForm, PeiForm
-from .models import ApresentacaoNapne, FeedbackPrivado, Noticia, Notificacao, Pei, SolicitacaoNapne
+from .forms import ApresentacaoNapneForm, ImagemCarrosselFormSet, NoticiaForm, NotificacaoForm, PeiForm, AlterarStatusPeiForm
+from .models import ApresentacaoNapne, FeedbackPrivado, Noticia, Notificacao, Pei, SolicitacaoNapne, HistoricoPei
 
 
 @napne_required
@@ -80,6 +80,30 @@ def editar_pei(request, id):
     else:
         form = PeiForm(instance=pei)
     return render(request, 'core/editar_pei.html', {'form': form, 'pei': pei})
+
+@napne_required
+def alterar_status_pei(request,id):
+    pei = get_object_or_404(Pei, id = id)
+
+    if request.method == 'POST':
+        form = AlterarStatusPeiForm(request.POST)
+        if form.is_valid():
+            novo_status = form.cleaned_data['status']
+            observacao = form.cleaned_data['observacao']
+            historico = pei.alterar_status(novo_status, request.user, observacao, request=request)
+            if historico:
+                messages.success(request, f'Status do PEI atualizado para "{pei.get_status_display()}".')
+            else:
+                messages.info(request, 'O PEI já estava com esse status.')
+            return redirect('detalhar_pei', id=pei.id)
+    else:
+        form = AlterarStatusPeiForm(initial={'status': pei.status})
+    return render(request, 'core/alterar_status_pei.html', {'form': form, 'pei': pei})
+
+@napne_required
+def listar_historico_peis(request):
+    historico = HistoricoPei.objects.select_related('pei', 'alterado_por').order_by('-alterado_em')
+    return render(request, 'core/listar_historico_peis.html', {'historico': historico})
 
 @napne_required
 def baixar_pei(request, id):
