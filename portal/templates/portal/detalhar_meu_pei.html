@@ -1,0 +1,55 @@
+{% extends "portal/base.html" %}
+
+{% block title %}{{ pei.titulo }} | Portal NAPNE{% endblock %}
+
+{% block content %}
+
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'index' %}">Notícias</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'meus_peis' %}">Meus PEIs</a></li>
+            <li class="breadcrumb-item active">{{ pei.titulo }}</li>
+        </ol>
+    </nav>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white">
+            <h1 class="h5 mb-0">{{ pei.titulo }}</h1>
+        </div>
+        <div class="card-body">
+            <p><strong>Enviado em:</strong> {{ pei.data_envio }}</p>
+            <p>
+                <strong>Status:</strong>
+                <span class="badge bg-{{ pei.badge_theme }}">{{ pei.get_status_display }}</span>
+            </p>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-white">
+            <h2 class="h6 mb-0">Histórico de movimentações</h2>
+        </div>
+        <div class="card-body">
+            {% if historico %}
+            <ul class="list-unstyled mb-0">
+                {% for item in historico %}
+                <li class="mb-3 pb-3 border-bottom">
+                    <p class="mb-1">
+                        <span class="badge bg-{{ item.badge_anterior_theme }}">{{ item.get_status_anterior_display }}</span>
+                        <i class="bi bi-arrow-right mx-1"></i>
+                        <span class="badge bg-{{ item.badge_novo_theme }}">{{ item.get_status_novo_display }}</span>
+                    </p>
+                    <p class="mb-1 small text-muted">{{ item.alterado_em|date:"d/m/Y H:i" }}</p>
+                    {% if item.observacao %}
+                    <p class="mb-0">{{ item.observacao }}</p>
+                    {% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="text-muted mb-0">Ainda não há mudanças de status registradas para este PEI.</p>
+            {% endif %}
+        </div>
+    </div>
+
+{% endblock %}

@@ -29,6 +29,8 @@ from core.models import (
     Noticia,
     Notificacao,
     SolicitacaoNapne,
+    Pei,
+    HistoricoPei
 )
 
 
@@ -64,6 +66,29 @@ def enviar_pei(request):
     else:
         form = PeiForm()
     return render(request, 'portal/enviar_pei.html', {'form': form})
+
+@professor_required
+def meus_peis(request):
+    peis = Pei.objects.filter(professor=request.user).order_by('-data_envio')
+    return render(request, 'portal/meus_peis.html', {'peis': peis})
+
+
+@professor_required
+def detalhar_meu_pei(request, id):
+    pei = get_object_or_404(Pei, id=id)
+
+    if pei.professor_id != request.user.id:
+        raise PermissionDenied("Você não tem permissão para acessar o PEI de outro professor.")
+
+    historico = pei.historico.select_related('alterado_por').order_by('alterado_em')
+    return render(request, 'portal/detalhar_meu_pei.html', {'pei': pei, 'historico': historico})
+
+@professor_required
+def historico_meus_peis(request):
+    historico = HistoricoPei.objects.filter(
+        pei__professor=request.user
+    ).select_related('pei').order_by('-alterado_em')
+    return render(request, 'portal/historico_meus_peis.html', {'historico': historico})
 
 def pesquisar_noticias(request):
     termo = request.GET.get('q', '').strip()
@@ -264,7 +289,7 @@ TAMANHO_TRECHO_NOTIFICACAO = 120
 
 
 def _trecho(texto):
-    limpo = ''.join(strip_tags(texto or '').split())
+    limpo = ' '.join(strip_tags(texto or '').split())
     return Truncator(limpo).chars(TAMANHO_TRECHO_NOTIFICACAO).strip()
 
 def _ler_desde(request):

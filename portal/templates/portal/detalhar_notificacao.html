@@ -18,7 +18,7 @@
                 {% if notificacao.remetente %}{{ notificacao.remetente.get_full_name|default:notificacao.remetente.username }}{% else %}equipe do NAPNE{% endif %}
                 em {{ notificacao.criado_em|date:"d/m/Y H:i" }}
             </p>
-            <p>{{ notificacao.conteudo }}</p>
+            {{ notificacao.conteudo|urlize }}
 
             <a href="{% url 'minhas_notificacoes' %}" class="btn btn-secondary btn-sm mt-3">&laquo; Voltar para notificações</a>
         </div>

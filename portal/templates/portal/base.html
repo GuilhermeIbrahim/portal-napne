@@ -53,10 +53,22 @@
                             </a>
                         </li>
                         {% if request.user|has_group:"Servidor" %}
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'enviar_pei' %}">
-                                    <i class="bi bi-file-earmark-arrow-up"></i> Enviar PEI
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="menuPeis" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-file-earmark-text"></i> PEIs
                                 </a>
+                                <ul class="dropdown-menu" aria-labelledby="menuPeis">
+                                    <li>
+                                        <a class="dropdown-item" href="{% url 'enviar_pei' %}">
+                                            <i class="bi bi-file-earmark-arrow-up"></i> Enviar PEI
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="{% url 'meus_peis' %}">
+                                            <i class="bi bi-list-check"></i> Meus PEIs
+                                        </a>
+                                    </li>
+                                </ul>
                             </li>
                         {% endif %}
                         {% if request.user|has_group:"NAPNE" %}

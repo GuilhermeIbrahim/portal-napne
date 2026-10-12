@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from .models import Noticia, Pei, SolicitacaoNapne, Usuario, FeedbackPublico, FeedbackPrivado, Notificacao
+from .models import Noticia, Pei, SolicitacaoNapne, Usuario, FeedbackPublico, FeedbackPrivado, Notificacao, HistoricoPei
 
 admin.site.register(Usuario, UserAdmin)
 
@@ -40,3 +40,9 @@ class NotificacaoAdmin(admin.ModelAdmin):
     list_display = ('titulo', 'destino_tipo', 'destinatario', 'remetente', 'criado_em')
     list_filter = ('destino_tipo', 'criado_em')
     search_fields = ('titulo', 'conteudo')
+
+
+@admin.register(HistoricoPei)
+class HistoricoPeiAdmin(admin.ModelAdmin):
+    list_display = ('pei', 'status_anterior', 'status_novo', 'alterado_por', 'alterado_em')
+    list_filter = ('status_novo',)
