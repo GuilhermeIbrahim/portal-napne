@@ -289,7 +289,7 @@ TAMANHO_TRECHO_NOTIFICACAO = 120
 
 
 def _trecho(texto):
-    limpo = ''.join(strip_tags(texto or '').split())
+    limpo = ' '.join(strip_tags(texto or '').split())
     return Truncator(limpo).chars(TAMANHO_TRECHO_NOTIFICACAO).strip()
 
 def _ler_desde(request):
