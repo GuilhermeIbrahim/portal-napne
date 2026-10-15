@@ -1,7 +1,17 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from .models import Noticia, Pei, SolicitacaoNapne, Usuario, FeedbackPublico, FeedbackPrivado, Notificacao, HistoricoPei
+from .models import (
+    FeedbackPrivado,
+    FeedbackPublico,
+    HistoricoPei,
+    Noticia,
+    Notificacao,
+    Pei,
+    SolicitacaoNapne,
+    Usuario,
+    VersaoPei,
+)
 
 admin.site.register(Usuario, UserAdmin)
 
@@ -11,11 +21,41 @@ class NoticiaAdmin(admin.ModelAdmin):
     list_filter = ('data',)
     search_fields = ('titulo', 'conteudo')
 
+class VersaoPeiInline(admin.TabularInline):
+    model = VersaoPei
+    extra = 0
+    can_delete = False
+    fields = ('numero', 'arquivo', 'enviado_por', 'enviado_em', 'comentario')
+    readonly_fields = fields
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+
+class HistoricoPeiInline(admin.TabularInline):
+    model = HistoricoPei
+    extra = 0
+    can_delete = False
+    fields = ('alterado_em', 'status_anterior', 'status_novo', 'alterado_por', 'versao', 'observacao')
+    readonly_fields = fields
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+
 @admin.register(Pei)
 class PeiAdmin(admin.ModelAdmin):
-    list_display = ('titulo', 'data_envio', 'professor')
-    list_filter = ('data_envio', 'professor')
+    list_display = ('titulo', 'status', 'data_envio', 'professor')
+    list_filter = ('status', 'data_envio', 'professor')
     search_fields = ('titulo',)
+    inlines = [VersaoPeiInline, HistoricoPeiInline]
+
+    def get_readonly_fields(self, request, obj=None):
+        # Status e arquivo só mudam pelo fluxo de análise/nova versão; assim o histórico não fica incoerente.
+        if obj:
+            return ('status', 'arquivo')
+        return ()
+
 
 @admin.register(SolicitacaoNapne)
 class SolicitacaoNapneAdmin(admin.ModelAdmin):
