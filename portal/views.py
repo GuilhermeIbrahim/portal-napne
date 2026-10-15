@@ -189,6 +189,7 @@ def login_napne(request):
         form = LoginNapneForm()
     return render(request, 'portal/login_napne.html', {'form': form})
 
+@login_required
 def fazer_feedback_publico(request, noticia_id):
     noticia = get_object_or_404(Noticia, id=noticia_id)
     if request.method == 'POST':
