@@ -3,23 +3,25 @@ from django.contrib.auth import login as auth_login
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
-from django.db.models import Q, Max
+from django.db.models import Max, Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils import timezone
-from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.utils.text import Truncator
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_GET
 
 from core.decorators import professor_required
+from core.downloads import resposta_de_download
 from core.forms import (
     CadastroNapneForm,
     FeedbackPrivadoForm,
     FeedbackPublicoForm,
     LoginNapneForm,
+    NovaVersaoPeiForm,
     PeiForm,
 )
 from core.models import (
@@ -28,9 +30,10 @@ from core.models import (
     FeedbackPublico,
     Noticia,
     Notificacao,
-    SolicitacaoNapne,
     Pei,
-    HistoricoPei
+    SolicitacaoNapne,
+    TransicaoPeiInvalida,
+    VersaoPei,
 )
 
 
@@ -52,7 +55,6 @@ def detalhe(request, id):
     context = {'noticia': noticia}
     return render(request, "portal/detalhe.html", context)
 
-
 @professor_required
 def enviar_pei(request):
     if request.method == 'POST':
@@ -61,34 +63,85 @@ def enviar_pei(request):
             pei = form.save(commit=False)
             pei.professor = request.user
             pei.save()
-            messages.success(request, 'PEI enviado com sucesso!')
-            return redirect('index')
+            messages.success(request, 'PEI enviado com sucesso! Acompanhe a análise do NAPNE por aqui.')
+            return redirect('meus_peis')
     else:
         form = PeiForm()
     return render(request, 'portal/enviar_pei.html', {'form': form})
 
 @professor_required
 def meus_peis(request):
-    peis = Pei.objects.filter(professor=request.user).order_by('-data_envio')
+    peis = Pei.objects.filter(professor=request.user).order_by('-data_envio', '-id')
     return render(request, 'portal/meus_peis.html', {'peis': peis})
+
+
+def _pei_do_professor(request, id):
+    pei = get_object_or_404(Pei, id=id)
+    if pei.professor_id != request.user.id:
+        raise PermissionDenied("Você não tem permissão para acessar o PEI de outro professor.")
+    return pei
+
+
+def _decisao_atual(pei, historico):
+    if pei.status == Pei.EM_ANALISE:
+        return None
+    for item in reversed(historico):
+        if item.status_novo == pei.status:
+            return item
+    return None
 
 
 @professor_required
 def detalhar_meu_pei(request, id):
-    pei = get_object_or_404(Pei, id=id)
+    pei = _pei_do_professor(request, id)
 
-    if pei.professor_id != request.user.id:
-        raise PermissionDenied("Você não tem permissão para acessar o PEI de outro professor.")
+    historico = list(pei.historico.select_related('alterado_por', 'versao'))
 
-    historico = pei.historico.select_related('alterado_por').order_by('alterado_em')
-    return render(request, 'portal/detalhar_meu_pei.html', {'pei': pei, 'historico': historico})
+    context = {
+        'pei': pei,
+        'historico': historico,
+        'versoes': pei.versoes.select_related('enviado_por'),
+        'parecer_atual': _decisao_atual(pei, historico),
+    }
+    return render(request, 'portal/detalhar_meu_pei.html', context)
 
 @professor_required
-def historico_meus_peis(request):
-    historico = HistoricoPei.objects.filter(
-        pei__professor=request.user
-    ).select_related('pei').order_by('-alterado_em')
-    return render(request, 'portal/historico_meus_peis.html', {'historico': historico})
+def reenviar_pei(request, id):
+    pei = _pei_do_professor(request, id)
+
+    if not pei.aguarda_nova_versao():
+        messages.error(request, 'Só é possível enviar uma nova versão de um PEI devolvido ou com ajustes solicitados.')
+        return redirect('detalhar_meu_pei', id=pei.id)
+
+    if request.method == 'POST':
+        form = NovaVersaoPeiForm(request.POST, request.FILES)
+        if form.is_valid():
+            try:
+                pei.enviar_nova_versao(
+                    form.cleaned_data['arquivo'],
+                    request.user,
+                    form.cleaned_data['comentario'],
+                    request=request,
+                )
+            except TransicaoPeiInvalida as erro:
+                messages.error(request, str(erro))
+                return redirect('detalhar_meu_pei', id=pei.id)
+
+            messages.success(request, 'Nova versão enviada! O PEI voltou para "Em análise".')
+            return redirect('detalhar_meu_pei', id=pei.id)
+    else:
+        form = NovaVersaoPeiForm()
+
+    historico = list(pei.historico.select_related('alterado_por'))
+    contexto = {'form': form, 'pei': pei, 'parecer_atual': _decisao_atual(pei, historico)}
+    return render(request, 'portal/reenviar_pei.html', contexto)
+
+@professor_required
+def baixar_minha_versao_pei(request, versao_id):
+    versao = get_object_or_404(VersaoPei.objects.select_related('pei'), id=versao_id)
+    if versao.pei.professor_id != request.user.id:
+        raise PermissionDenied("Você não tem permissão para acessar o PEI de outro professor.")
+    return resposta_de_download(versao.arquivo)
 
 def pesquisar_noticias(request):
     termo = request.GET.get('q', '').strip()
