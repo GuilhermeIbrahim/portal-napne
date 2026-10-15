@@ -33,12 +33,20 @@
                     {% for pei in peis %}
                     <tr>
                         <td>{{ pei.titulo }}</td>
-                        <td>{{ pei.data_envio }}</td>
-                        <td><span class="badge bg-{{ pei.badge_theme }}">{{ pei.get_status_display }}</span></td>
+                        <td>{{ pei.data_envio|date:"d/m/Y" }}</td>
+                        <td>
+                            {% include "partials/_selo_status_pei.html" with tema=pei.badge_theme texto=pei.get_status_display %}
+                            {% if pei.aguarda_nova_versao %}<span class="d-block small text-danger-emphasis mt-1">Ação necessária: enviar nova versão</span>{% endif %}
+                        </td>
                         <td class="text-end">
                             <a href="{% url 'detalhar_meu_pei' pei.id %}" class="btn btn-sm btn-outline-primary">
-                                <i class="bi bi-eye"></i> Ver
+                                <i class="bi bi-eye" aria-hidden="true"></i> Ver<span class="visually-hidden"> PEI {{ pei.titulo }}</span>
                             </a>
+                            {% if pei.aguarda_nova_versao %}
+                                <a href="{% url 'reenviar_pei' pei.id %}" class="btn btn-sm btn-primary">
+                                    <i class="bi bi-upload" aria-hidden="true"></i> Enviar nova versão<span class="visually-hidden"> do PEI {{ pei.titulo }}</span>
+                                </a>
+                            {% endif %}
                         </td>
                     </tr>
                     {% endfor %}

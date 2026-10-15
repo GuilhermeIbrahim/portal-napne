@@ -1,0 +1,44 @@
+{% extends "portal/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Enviar nova versão | Portal NAPNE{% endblock %}
+
+{% block content %}
+
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'index' %}">Notícias</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'meus_peis' %}">Meus PEIs</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'detalhar_meu_pei' pei.id %}">{{ pei.titulo }}</a></li>
+            <li class="breadcrumb-item active">Nova versão</li>
+        </ol>
+    </nav>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-white">
+            <h1 class="h5 mb-0">Enviar nova versão do PEI</h1>
+        </div>
+        <div class="card-body">
+            <p class="text-muted">
+                O PEI "{{ pei.titulo }}" está
+                {% include "partials/_selo_status_pei.html" with tema=pei.badge_theme texto=pei.get_status_display %}.
+                Ao enviar o arquivo corrigido, ele volta para "Em análise". As versões anteriores continuam guardadas.
+            </p>
+            {% if parecer_atual and parecer_atual.observacao %}
+                <p class="fw-semibold mb-1">Parecer do NAPNE:</p>
+                <div class="parecer-pei mb-3">{{ parecer_atual.observacao }}</div>
+            {% endif %}
+            <form method="post" enctype="multipart/form-data" novalidate>
+                {% csrf_token %}
+                {% crispy form form.helper %}
+                <div class="mt-3">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-upload" aria-hidden="true"></i> Enviar nova versão
+                    </button>
+                    <a href="{% url 'detalhar_meu_pei' pei.id %}" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+{% endblock %}
