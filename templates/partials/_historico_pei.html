@@ -1,0 +1,26 @@
+{% if historico %}
+    <ol class="historico-pei list-unstyled mb-0">
+        {% for item in historico %}
+            <li class="historico-pei__item">
+                <p class="historico-pei__evento mb-1">
+                    {{ item.descricao_evento }}
+                    {% if item.versao %}<span class="badge text-bg-light border ms-1">Versão {{ item.versao.numero }}</span>{% endif %}
+                </p>
+                <p class="mb-1">
+                    {% include "partials/_selo_status_pei.html" with tema=item.badge_anterior_theme texto=item.get_status_anterior_display %}
+                    <i class="bi bi-arrow-right mx-1" aria-hidden="true"></i><span class="visually-hidden">para</span>
+                    {% include "partials/_selo_status_pei.html" with tema=item.badge_novo_theme texto=item.get_status_novo_display %}
+                </p>
+                <p class="small text-muted mb-1">
+                    {{ item.alterado_em|date:"d/m/Y H:i" }}
+                    · {% if item.alterado_por %}{{ item.alterado_por.get_full_name|default:item.alterado_por.username }}{% else %}usuário removido{% endif %}
+                </p>
+                {% if item.observacao %}
+                    <div class="parecer-pei">{{ item.observacao }}</div>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ol>
+{% else %}
+    <p class="text-muted mb-0">Ainda não há movimentações registradas para este PEI.</p>
+{% endif %}

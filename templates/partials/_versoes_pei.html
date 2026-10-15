@@ -1,0 +1,33 @@
+<div class="table-responsive">
+    <table class="table table-sm align-middle mb-0">
+        <caption class="visually-hidden">Versões do arquivo do PEI</caption>
+        <thead>
+            <tr>
+                <th scope="col">Versão</th>
+                <th scope="col">Enviada em</th>
+                <th scope="col">Enviada por</th>
+                <th scope="col">Comentário</th>
+                <th scope="col" class="text-end">Arquivo</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for versao in versoes %}
+                <tr>
+                    <td>
+                        {{ versao.numero }}
+                        {% if forloop.last %}<span class="badge text-bg-primary ms-1">atual</span>{% endif %}
+                    </td>
+                    <td>{{ versao.enviado_em|date:"d/m/Y H:i" }}</td>
+                    <td>{% if versao.enviado_por %}{{ versao.enviado_por.get_full_name|default:versao.enviado_por.username }}{% else %}usuário removido{% endif %}</td>
+                    <td class="texto-pre-line">{{ versao.comentario|default:"—" }}</td>
+                    <td class="text-end">
+                        <a class="btn btn-sm btn-outline-primary"
+                           href="{% if painel %}{% url 'baixar_versao_pei' versao.id %}{% else %}{% url 'baixar_minha_versao_pei' versao.id %}{% endif %}">
+                            <i class="bi bi-download" aria-hidden="true"></i> Baixar<span class="visually-hidden"> versão {{ versao.numero }}</span>
+                        </a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
