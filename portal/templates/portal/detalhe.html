@@ -35,14 +35,20 @@
 
     <a href="{% url 'index' %}" class="btn btn-link mt-3 ps-0">&laquo; Voltar para notícias</a>
 
-    <div class="d-flex gap-2 mt-3 mb-4">
+<div class="d-flex gap-2 mt-3 mb-4">
+    {% if request.user.is_authenticated %}
         <a href="{% url 'fazer_feedback_publico' noticia.id %}" class="btn btn-outline-primary btn-sm">
             <i class="bi bi-chat-dots"></i> Comentar
         </a>
         <a href="{% url 'fazer_feedback_privado' %}?noticia={{ noticia.id }}" class="btn btn-outline-secondary btn-sm">
             <i class="bi bi-envelope"></i> Enviar feedback privado ao NAPNE
         </a>
-    </div>
+    {% else %}
+        <a href="{% url 'login_napne' %}?next={% url 'detalhe' noticia.id %}" class="btn btn-outline-primary btn-sm">
+            <i class="bi bi-box-arrow-in-right"></i> Faça login para comentar
+        </a>
+    {% endif %}
+</div>
 
     <section>
         <h2 class="h5">Comentários ({{ noticia.comentarios.count }})</h2>
