@@ -1,13 +1,13 @@
 from django.contrib import messages
 from django.contrib.auth.models import Group
-from django.http import FileResponse
+from django.db.models import Max
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 
 from .decorators import napne_required
-from .forms import ApresentacaoNapneForm, ImagemCarrosselFormSet, NoticiaForm, NotificacaoForm, PeiForm, AlterarStatusPeiForm
-from .models import ApresentacaoNapne, FeedbackPrivado, Noticia, Notificacao, Pei, SolicitacaoNapne, HistoricoPei
-
+from .downloads import resposta_de_download
+from .forms import AnalisePeiForm, ApresentacaoNapneForm, EditarPeiForm, ImagemCarrosselFormSet, NoticiaForm, NotificacaoForm
+from .models import ApresentacaoNapne, FeedbackPrivado, Noticia, Notificacao, Pei, SolicitacaoNapne, TransicaoPeiInvalida, VersaoPei
 
 @napne_required
 def painel_home(request):
@@ -15,6 +15,7 @@ def painel_home(request):
         'total_noticias': Noticia.objects.count(),
         'total_peis': Pei.objects.count(),
         'total_solicitacoes_pendentes': SolicitacaoNapne.objects.filter(status=SolicitacaoNapne.PENDENTE).count(),
+        'total_peis_em_analise': Pei.objects.filter(status=Pei.EM_ANALISE).count(),
     }
     return render(request, "core/painel_home.html", context)
 
@@ -51,8 +52,19 @@ def excluir_noticia(request, id):
 
 @napne_required
 def listar_peis(request):
-    peis = Pei.objects.all()
-    context = {'peis': peis}
+    status = request.GET.get('status', '')
+    peis = Pei.objects.select_related('professor').annotate(ultima_versao=Max('versoes__numero')).order_by('-data_envio', '-id')
+
+    if status in dict(Pei.STATUS_CHOICES):
+        peis = peis.filter(status=status)
+    else:
+        status = ''
+
+    context = {
+        'peis': peis,
+        'status_atual': status,
+        'status_choices': Pei.STATUS_CHOICES,
+    }
     return render(request, 'core/listar_peis.html', context)
 
 @napne_required
@@ -65,52 +77,67 @@ def excluir_pei(request, id):
 
 @napne_required
 def detalhar_pei(request, id):
-    pei = get_object_or_404(Pei, id=id)
-    context = {'pei': pei}
+    """Detalhe do PEI + registro da análise (POST) pelo NAPNE."""
+    pei = get_object_or_404(Pei.objects.select_related('professor'), id=id)
+    form = AnalisePeiForm()
+
+    if request.method == 'POST':
+        if not pei.pode_ser_analisado():
+            messages.error(
+                request,
+                f'Só é possível registrar decisão em PEI "Em análise" (status atual: {pei.get_status_display()}).',
+            )
+            return redirect('detalhar_pei', id=pei.id)
+
+        form = AnalisePeiForm(request.POST)
+        if form.is_valid():
+            try:
+                pei.registrar_analise(
+                    form.cleaned_data['decisao'],
+                    form.cleaned_data['parecer'],
+                    request.user,
+                    request=request,
+                )
+            except TransicaoPeiInvalida as erro:
+                messages.error(request, str(erro))
+                return redirect('detalhar_pei', id=pei.id)
+
+            messages.success(
+                request,
+                f'Análise registrada: o PEI agora está "{pei.get_status_display()}" e o professor foi notificado.',
+            )
+            return redirect('detalhar_pei', id=pei.id)
+
+    context = {
+        'pei': pei,
+        'form': form,
+        'historico': pei.historico.select_related('alterado_por', 'versao'),
+        'versoes': pei.versoes.select_related('enviado_por'),
+    }
     return render(request, 'core/detalhar_pei.html', context)
 
 @napne_required
 def editar_pei(request, id):
     pei = get_object_or_404(Pei, id=id)
     if request.method == 'POST':
-        form = PeiForm(request.POST, request.FILES, instance=pei)
+        form = EditarPeiForm(request.POST, instance=pei)
         if form.is_valid():
             form.save()
             return redirect('detalhar_pei', id=pei.id)
     else:
-        form = PeiForm(instance=pei)
+        form = EditarPeiForm(instance=pei)
     return render(request, 'core/editar_pei.html', {'form': form, 'pei': pei})
 
 @napne_required
-def alterar_status_pei(request,id):
-    pei = get_object_or_404(Pei, id = id)
-
-    if request.method == 'POST':
-        form = AlterarStatusPeiForm(request.POST)
-        if form.is_valid():
-            novo_status = form.cleaned_data['status']
-            observacao = form.cleaned_data['observacao']
-            historico = pei.alterar_status(novo_status, request.user, observacao, request=request)
-            if historico:
-                messages.success(request, f'Status do PEI atualizado para "{pei.get_status_display()}".')
-            else:
-                messages.info(request, 'O PEI já estava com esse status.')
-            return redirect('detalhar_pei', id=pei.id)
-    else:
-        form = AlterarStatusPeiForm(initial={'status': pei.status})
-    return render(request, 'core/alterar_status_pei.html', {'form': form, 'pei': pei})
-
-@napne_required
-def listar_historico_peis(request):
-    historico = HistoricoPei.objects.select_related('pei', 'alterado_por').order_by('-alterado_em')
-    return render(request, 'core/listar_historico_peis.html', {'historico': historico})
-
-@napne_required
 def baixar_pei(request, id):
+    """Baixa o arquivo da versão mais recente do PEI."""
     pei = get_object_or_404(Pei, id=id)
-    response = FileResponse(pei.arquivo.open(), as_attachment=True, filename=pei.arquivo.name)
-    response['Content-disposition'] = f'attachment; filename="{pei.arquivo.name}"'
-    return response
+    return resposta_de_download(pei.arquivo)
+
+@napne_required
+def baixar_versao_pei(request, versao_id):
+    versao = get_object_or_404(VersaoPei, id=versao_id)
+    return resposta_de_download(versao.arquivo)
 
 @napne_required
 def solicitacoes_napne(request):
