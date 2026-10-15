@@ -1,7 +1,7 @@
 {% extends "painel_base.html" %}
 {% load crispy_forms_tags %}
 
-{% block page_title %}Editar PEI{% endblock %}
+{% block page_title %}Editar título do PEI{% endblock %}
 
 {% block breadcrumb %}
     <li class="breadcrumb-item"><a href="{% url 'listar_peis' %}">PEIs recebidos</a></li>
@@ -10,7 +10,11 @@
 
 {% block content %}
 
-    {% component "adminlte_card" title="Editar PEI" icon="bi bi-pencil-square" theme="primary" %}
+    {% component "adminlte_card" title="Editar título do PEI" icon="bi bi-pencil-square" theme="primary" %}
+
+    <p class="text-muted">
+        O arquivo pertence ao professor. Para corrigi-lo, devolva o PEI ou solicite ajustes: ele envia uma nova versão e as anteriores continuam guardadas.
+    </p>
 
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}

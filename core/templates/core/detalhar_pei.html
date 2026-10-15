@@ -1,4 +1,5 @@
 {% extends "painel_base.html" %}
+{% load static crispy_forms_tags %}
 
 {% block page_title %}{{ pei.titulo }}{% endblock %}
 
@@ -13,24 +14,22 @@
 
         {% fill "default" %}
         <p><strong>Professor:</strong> {{ pei.professor.get_full_name|default:pei.professor.username }}</p>
-        <p><strong>Enviado em:</strong> {{ pei.data_envio }}</p>
+        <p><strong>Enviado em:</strong> {{ pei.data_envio|date:"d/m/Y" }}</p>
         <p>
             <strong>Status:</strong>
-            <span class="badge bg-{{ pei.badge_theme }}">{{ pei.get_status_display }}</span>
+            {% include "partials/_selo_status_pei.html" with tema=pei.badge_theme texto=pei.get_status_display %}
         </p>
+        <p class="mb-0"><strong>Versão atual do arquivo:</strong> {{ pei.versao_atual.numero }}</p>
         {% endfill %}
         {% fill "footer" %}
             <a href="{% url 'baixar_pei' pei.id %}" class="btn btn-sm btn-primary">
-                <i class="bi bi-download"></i> Baixar arquivo
-            </a>
-            <a href="{% url 'alterar_status_pei' pei.id %}" class="btn btn-sm btn-info">
-                <i class="bi bi-arrow-repeat"></i> Alterar status
+                <i class="bi bi-download" aria-hidden="true"></i> Baixar arquivo atual
             </a>
             <a href="{% url 'editar_pei' pei.id %}" class="btn btn-sm btn-warning">
-                <i class="bi bi-pencil"></i> Editar
+                <i class="bi bi-pencil" aria-hidden="true"></i> Editar título
             </a>
             <a href="{% url 'excluir_pei' pei.id %}" class="btn btn-sm btn-danger">
-                <i class="bi bi-trash"></i> Excluir
+                <i class="bi bi-trash" aria-hidden="true"></i> Excluir
             </a>
             <a href="{% url 'listar_peis' %}" class="btn btn-sm btn-secondary">
                 Voltar
@@ -39,4 +38,40 @@
 
     {% endcomponent %}
 
+    {% if pei.pode_ser_analisado %}
+        {% component "adminlte_card" title="Registrar análise" icon="bi bi-clipboard-check" theme="primary" %}
+            <form method="post" id="form-analise-pei"
+                  data-confirmar="Registrar esta decisão? O professor será notificado e o PEI deixará de estar em análise.">
+                {% csrf_token %}
+                {% crispy form form.helper %}
+                <div class="mt-3">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-circle" aria-hidden="true"></i> Registrar análise
+                    </button>
+                </div>
+            </form>
+        {% endcomponent %}
+    {% elif pei.aguarda_nova_versao %}
+        {% component "adminlte_callout" theme="warning" title="Aguardando nova versão do professor" %}
+            Este PEI está "{{ pei.get_status_display }}". Quando o professor enviar o arquivo corrigido,
+            ele volta para "Em análise" e uma nova decisão poderá ser registrada.
+        {% endcomponent %}
+    {% else %}
+        {% component "adminlte_callout" theme="success" title="Análise concluída" %}
+            Este PEI está "{{ pei.get_status_display }}". Só é possível registrar decisão em PEI "Em análise".
+        {% endcomponent %}
+    {% endif %}
+
+    {% component "adminlte_card" title="Versões do arquivo" icon="bi bi-files" theme="secondary" %}
+        {% include "partials/_versoes_pei.html" with painel=True %}
+    {% endcomponent %}
+
+    {% component "adminlte_card" title="Histórico e pareceres" icon="bi bi-clock-history" theme="secondary" %}
+        {% include "partials/_historico_pei.html" %}
+    {% endcomponent %}
+
+{% endblock %}
+
+{% block painel_js %}
+    <script src="{% static 'js/analise-pei.js' %}"></script>
 {% endblock %}
