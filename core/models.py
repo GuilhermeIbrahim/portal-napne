@@ -1,9 +1,11 @@
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
-from django.db import models
+from django.core.exceptions import PermissionDenied, ValidationError
+from django.db import models, transaction
 from django.db.models import Q
-from django_ckeditor_5.fields import CKEditor5Field
 from django.urls import reverse
+from django.utils.text import Truncator
+from django_ckeditor_5.fields import CKEditor5Field
 
 
 class Usuario(AbstractUser):
@@ -18,75 +20,198 @@ class Noticia(models.Model):
     def __str__(self):
         return self.titulo
 
-class Pei(models.Model):
-    titulo = models.CharField(max_length= 100) 
-    arquivo = models.FileField(upload_to="pei")
-    data_envio = models.DateField(auto_now_add=True)
-    professor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+class TransicaoPeiInvalida(Exception):
+    """A operação não é permitida no status atual do PEI (ex.: analisar um PEI que não está em análise)."""
 
+
+class Pei(models.Model):
     EM_ANALISE = "em_analise"
-    ANALISADO = "analizado"
+    ANALISADO = "analisado"
     DEVOLVIDO = "devolvido"
+    AJUSTES_SOLICITADOS = "ajustes_solicitados"
 
     STATUS_CHOICES = [
         (EM_ANALISE, "Em análise"),
         (ANALISADO, "Analisado"),
         (DEVOLVIDO, "Devolvido"),
+        (AJUSTES_SOLICITADOS, "Ajustes solicitados"),
     ]
 
     STATUS_BADGE = {
-        EM_ANALISE : "warning",
-        ANALISADO : "success",
-        DEVOLVIDO : "danger",
+        EM_ANALISE: "warning",
+        ANALISADO: "success",
+        DEVOLVIDO: "danger",
+        AJUSTES_SOLICITADOS: "info",
     }
+
+    DECISAO_APROVAR = "aprovar"
+    DECISAO_DEVOLVER = "devolver"
+    DECISAO_AJUSTES = "ajustes"
+
+    DECISOES = {
+        DECISAO_APROVAR: ANALISADO,
+        DECISAO_DEVOLVER: DEVOLVIDO,
+        DECISAO_AJUSTES: AJUSTES_SOLICITADOS,
+    }
+    DECISOES_QUE_EXIGEM_PARECER = (DECISAO_DEVOLVER, DECISAO_AJUSTES)
+
+    STATUS_AGUARDANDO_NOVA_VERSAO = (DEVOLVIDO, AJUSTES_SOLICITADOS)
+
+    titulo = models.CharField(max_length=100)
+    arquivo = models.FileField(upload_to="pei")
+    data_envio = models.DateField(auto_now_add=True)
+    professor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=EM_ANALISE)
+
+    def __str__(self):
+        return self.titulo
 
     def badge_theme(self):
         return self.STATUS_BADGE.get(self.status, "secondary")
 
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=EM_ANALISE)
+    def save(self, *args, **kwargs):
+        criando = self._state.adding
+        super().save(*args, **kwargs)
+        if criando and self.arquivo:
+            VersaoPei.objects.create(
+                pei=self,
+                numero=1,
+                arquivo=self.arquivo.name,
+                enviado_por=self.professor,
+            )
 
-    def __str__(self):
-        return self.titulo 
+    def pode_ser_analisado(self):
+        return self.status == self.EM_ANALISE
 
-    def alterar_status(self, novo_status, alterado_por, observacao="", request=None):
-        if novo_status == self.status:
-            return None
+    def aguarda_nova_versao(self):
+        return self.status in self.STATUS_AGUARDANDO_NOVA_VERSAO
 
+    @property
+    def versao_atual(self):
+        return self.versoes.order_by("-numero").first()
+
+    def registrar_analise(self, decisao, parecer, analista, request=None):
+        if decisao not in self.DECISOES:
+            raise ValueError(f"Decisão desconhecida: {decisao!r}")
+
+        parecer = (parecer or "").strip()
+        if decisao in self.DECISOES_QUE_EXIGEM_PARECER and not parecer:
+            raise ValidationError({"parecer": "O parecer é obrigatório ao devolver ou solicitar ajustes."})
+
+        novo_status = self.DECISOES[decisao]
+
+        with transaction.atomic():
+            pei = Pei.objects.select_for_update().get(pk=self.pk)
+            if pei.status != self.EM_ANALISE:
+                raise TransicaoPeiInvalida(
+                    f"Só é possível registrar decisão em PEI \"Em análise\" (status atual: {pei.get_status_display()})."
+                )
+
+            historico = pei._registrar_mudanca(novo_status, analista, parecer)
+            pei._notificar_professor_da_analise(novo_status, analista)
+
+        self.status = novo_status
+        return historico
+
+    def enviar_nova_versao(self, arquivo, professor, comentario="", request=None):
+        comentario = (comentario or "").strip()
+
+        with transaction.atomic():
+            pei = Pei.objects.select_for_update().get(pk=self.pk)
+
+            if pei.professor_id != professor.id:
+                raise PermissionDenied("Você não tem permissão para alterar o PEI de outro professor.")
+            if pei.status not in self.STATUS_AGUARDANDO_NOVA_VERSAO:
+                raise TransicaoPeiInvalida(
+                    "Só é possível enviar uma nova versão de um PEI devolvido ou com ajustes solicitados."
+                )
+
+            ultima = pei.versao_atual
+            versao = VersaoPei.objects.create(
+                pei=pei,
+                numero=(ultima.numero if ultima else 0) + 1,
+                arquivo=arquivo,
+                enviado_por=professor,
+                comentario=comentario,
+            )
+            pei.arquivo = versao.arquivo.name
+            pei.save(update_fields=["arquivo"])
+            historico = pei._registrar_mudanca(self.EM_ANALISE, professor, comentario, versao=versao)
+
+        self.arquivo = versao.arquivo.name
+        self.status = self.EM_ANALISE
+        return historico
+
+    def _registrar_mudanca(self, novo_status, autor, observacao="", versao=None):
         status_anterior = self.status
         self.status = novo_status
         self.save(update_fields=["status"])
-
-        historico = HistoricoPei.objects.create(
+        return HistoricoPei.objects.create(
             pei=self,
             status_anterior=status_anterior,
             status_novo=novo_status,
-            alterado_por=alterado_por,
+            alterado_por=autor,
             observacao=observacao,
+            versao=versao or self.versao_atual,
         )
 
-        caminho_pei = reverse("detalhar_meu_pei", args=[self.id])
-        link_pei = request.build_absolute_uri(caminho_pei) if request else caminho_pei
-
-        Notificacao.objects.create(
-            titulo=f"O status do PEI '{self.titulo}' foi alterado para '{self.get_status_display()}'",
-            conteudo=(
-                f"O status do PEI '{self.titulo}' foi alterado para "
-                f"'{self.get_status_display()}'. Acesse: {link_pei}"
+    def _notificar_professor_da_analise(self, novo_status, remetente):
+        textos = {
+            self.ANALISADO: (
+                "PEI analisado",
+                "O NAPNE concluiu a análise do PEI \"{titulo}\". Abra o PEI para ler o parecer.",
             ),
+            self.DEVOLVIDO: (
+                "PEI devolvido",
+                "O NAPNE devolveu o PEI \"{titulo}\". Abra o PEI para ler o parecer e enviar uma nova versão.",
+            ),
+            self.AJUSTES_SOLICITADOS: (
+                "Ajustes solicitados no PEI",
+                "O NAPNE solicitou ajustes no PEI \"{titulo}\". Abra o PEI para ler o parecer e enviar uma nova versão.",
+            ),
+        }
+        cabecalho, corpo = textos[novo_status]
+        Notificacao.objects.create(
+            titulo=Truncator(f"{cabecalho}: {self.titulo}").chars(100),
+            conteudo=corpo.format(titulo=self.titulo),
             destino_tipo=Notificacao.USUARIO,
             destinatario=self.professor,
-            remetente=alterado_por,
+            remetente=remetente,
+            link=reverse("detalhar_meu_pei", args=[self.id]),
         )
 
-        return historico
+
+class VersaoPei(models.Model):
+    pei = models.ForeignKey(Pei, on_delete=models.CASCADE, related_name="versoes")
+    numero = models.PositiveIntegerField()
+    arquivo = models.FileField(upload_to="pei")
+    enviado_por = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
+    enviado_em = models.DateTimeField(auto_now_add=True)
+    comentario = models.TextField(blank=True)
+
+    class Meta:
+        ordering = ["numero"]
+        constraints = [
+            models.UniqueConstraint(fields=["pei", "numero"], name="unique_numero_de_versao_por_pei"),
+        ]
+
+    def __str__(self):
+        return f"{self.pei.titulo} (versão {self.numero})"
+
 
 class HistoricoPei(models.Model):
     pei = models.ForeignKey(Pei, on_delete=models.CASCADE, related_name="historico")
     status_anterior = models.CharField(max_length=20, choices=Pei.STATUS_CHOICES)
     status_novo = models.CharField(max_length=20, choices=Pei.STATUS_CHOICES)
-    alterado_por = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True,)
-    observacao = models.TextField(blank=True)
+    alterado_por = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+    observacao = models.TextField(blank=True)  # parecer do NAPNE ou comentário do professor
     alterado_em = models.DateTimeField(auto_now_add=True)
+    versao = models.ForeignKey(
+        VersaoPei, on_delete=models.SET_NULL, null=True, blank=True, related_name="historico"
+    )
+
+    class Meta:
+        ordering = ["alterado_em", "id"]
 
     def badge_anterior_theme(self):
         return Pei.STATUS_BADGE.get(self.status_anterior, "secondary")
@@ -94,8 +219,16 @@ class HistoricoPei(models.Model):
     def badge_novo_theme(self):
         return Pei.STATUS_BADGE.get(self.status_novo, "secondary")
 
-    class Meta:
-        ordering = ["alterado_em"]
+    def descricao_evento(self):
+        if self.status_novo == Pei.EM_ANALISE:
+            if self.status_anterior in Pei.STATUS_AGUARDANDO_NOVA_VERSAO:
+                return "Nova versão enviada pelo professor"
+            return "Registro inicial"
+        return {
+            Pei.ANALISADO: "Análise concluída pelo NAPNE",
+            Pei.DEVOLVIDO: "PEI devolvido pelo NAPNE",
+            Pei.AJUSTES_SOLICITADOS: "Ajustes solicitados pelo NAPNE",
+        }.get(self.status_novo, "Status alterado")
 
     def __str__(self):
         return f"{self.pei.titulo}: {self.status_anterior} → {self.status_novo}"
@@ -197,6 +330,11 @@ class Notificacao(models.Model):
         related_name="notificacoes_lidas",
     )
     criado_em = models.DateTimeField(auto_now_add=True)
+    link = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="Caminho interno para onde a notificação leva (ex.: /meus-peis/3/). Preenchido pelo sistema.",
+    )
 
     class Meta:
         ordering = ["-criado_em"]

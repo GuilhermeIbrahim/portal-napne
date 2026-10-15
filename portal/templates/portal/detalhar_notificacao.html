@@ -20,7 +20,14 @@
             </p>
             {{ notificacao.conteudo|urlize }}
 
-            <a href="{% url 'minhas_notificacoes' %}" class="btn btn-secondary btn-sm mt-3">&laquo; Voltar para notificações</a>
+            <div class="d-flex flex-wrap gap-2 mt-3">
+                {% if notificacao.link %}
+                    <a href="{{ notificacao.link }}" class="btn btn-primary btn-sm">
+                        <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i> Abrir
+                    </a>
+                {% endif %}
+                <a href="{% url 'minhas_notificacoes' %}" class="btn btn-secondary btn-sm">&laquo; Voltar para notificações</a>
+            </div>
         </div>
     </div>
 

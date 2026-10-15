@@ -29,6 +29,7 @@
                 {% fill "default" %}
                     <p class="fs-4 mb-1">{{ total_peis }}</p>
                     <p class="text-muted mb-0">PEI(s) recebido(s)</p>
+                    <p class="mb-0"><strong>{{ total_peis_em_analise }}</strong> aguardando análise</p>
                 {% endfill %}
                 {% fill "footer" %}
                     <a href="{% url 'listar_peis' %}" class="btn btn-sm btn-primary">

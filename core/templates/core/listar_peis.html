@@ -10,6 +10,22 @@
 
     {% component "adminlte_card" title="PEIs recebidos" icon="bi bi-file-earmark-text" theme="primary" %}
 
+        <form method="get" class="row g-2 align-items-end mb-3">
+            <div class="col-sm-6 col-md-4">
+                <label for="filtro-status" class="form-label">Filtrar por status</label>
+                <select name="status" id="filtro-status" class="form-select">
+                    <option value="">Todos</option>
+                    {% for valor, rotulo in status_choices %}
+                        <option value="{{ valor }}"{% if valor == status_atual %} selected{% endif %}>{{ rotulo }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary"><i class="bi bi-funnel" aria-hidden="true"></i> Filtrar</button>
+                {% if status_atual %}<a href="{% url 'listar_peis' %}" class="btn btn-outline-secondary">Limpar</a>{% endif %}
+            </div>
+        </form>
+
         {% if peis %}
         <table class="table table-hover align-middle">
             <thead>
@@ -17,6 +33,7 @@
                     <th>Título</th>
                     <th>Professor</th>
                     <th>Data de envio</th>
+                    <th>Versão</th>
                     <th>Status</th>
                     <th class="text-end">Ações</th>
                 </tr>
@@ -26,17 +43,16 @@
                 <tr>
                     <td>{{ pei.titulo }}</td>
                     <td>{{ pei.professor.get_full_name|default:pei.professor.username }}</td>
-                    <td>{{ pei.data_envio }}</td>
-                    <td><span class="badge bg-{{ pei.badge_theme }}">{{ pei.get_status_display }}</span></td>
+                    <td>{{ pei.data_envio|date:"d/m/Y" }}</td>
+                    <td>{{ pei.ultima_versao }}</td>
+                    <td>{% include "partials/_selo_status_pei.html" with tema=pei.badge_theme texto=pei.get_status_display %}</td>
                     <td class="text-end">
                         <a href="{% url 'detalhar_pei' pei.id %}" class="btn btn-sm btn-outline-primary">
-                            <i class="bi bi-eye"></i>
-                        </a>
-                        <a href="{% url 'editar_pei' pei.id %}" class="btn btn-sm btn-warning">
-                            <i class="bi bi-pencil"></i>
+                            <i class="bi bi-eye" aria-hidden="true"></i>
+                            {% if pei.status == "em_analise" %}Analisar{% else %}Ver{% endif %}<span class="visually-hidden"> PEI {{ pei.titulo }}</span>
                         </a>
                         <a href="{% url 'excluir_pei' pei.id %}" class="btn btn-sm btn-danger">
-                            <i class="bi bi-trash"></i>
+                            <i class="bi bi-trash" aria-hidden="true"></i><span class="visually-hidden">Excluir PEI {{ pei.titulo }}</span>
                         </a>
                     </td>
                 </tr>
@@ -45,7 +61,7 @@
         </table>
         {% else %}
             {% component "adminlte_callout" theme="info" title="Nenhum PEI" %}
-                Nenhum PEI foi enviado ainda.
+                {% if status_atual %}Nenhum PEI com esse status.{% else %}Nenhum PEI foi enviado ainda.{% endif %}
             {% endcomponent %}
         {% endif %}
 

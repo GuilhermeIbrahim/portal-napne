@@ -13,7 +13,6 @@ from .models import (
     Noticia,
     Notificacao,
     Pei,
-    HistoricoPei
 )
 
 
@@ -64,12 +63,53 @@ class PeiForm(forms.ModelForm):
             Field("arquivo"),
         )
 
-class AlterarStatusPeiForm(forms.Form):
-    status = forms.ChoiceField(choices=Pei.STATUS_CHOICES, label="Novo status")
-    observacao = forms.CharField(
-        label="Observação (opcional)",
+class EditarPeiForm(forms.ModelForm):
+    """
+    O NAPNE só corrige o título. O arquivo pertence ao professor: para trocá-lo, ele envia uma
+    nova versão (assim o histórico de versões nunca é alterado em silêncio).
+    """
+
+    class Meta:
+        model = Pei
+        fields = ["titulo"]
+        labels = {"titulo": "Título"}
+        widgets = {"titulo": forms.TextInput(attrs={"placeholder": "Título do PEI"})}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.layout = Layout(Field("titulo"))
+
+
+class AnalisePeiForm(forms.Form):
+    PARECER_MAX = 2000
+
+    decisao = forms.ChoiceField(
+        label="Decisão",
+        choices=[
+            (Pei.DECISAO_APROVAR, "Aprovar — o PEI fica como \"Analisado\""),
+            (Pei.DECISAO_DEVOLVER, "Devolver ao professor"),
+            (Pei.DECISAO_AJUSTES, "Solicitar ajustes ao professor"),
+        ],
+        widget=forms.RadioSelect,
+        error_messages={
+            "required": "Escolha uma decisão: aprovar, devolver ou solicitar ajustes.",
+            "invalid_choice": "Escolha uma das decisões da lista.",
+        },
+    )
+    parecer = forms.CharField(
+        label="Parecer",
         required=False,
-        widget=forms.Textarea(attrs={"rows": 3, "placeholder": "Explique o motivo da mudança de status, se necessário"}),
+        max_length=PARECER_MAX,
+        help_text="Obrigatório ao devolver ou solicitar ajustes; opcional ao aprovar. O professor lê este texto no PEI.",
+        widget=forms.Textarea(attrs={
+            "rows": 5,
+            "placeholder": "Explique a decisão e, se for o caso, o que precisa ser corrigido",
+            "data-obrigatorio-para": ",".join(Pei.DECISOES_QUE_EXIGEM_PARECER),
+        }),
+        error_messages={"max_length": f"O parecer pode ter no máximo {PARECER_MAX} caracteres."},
     )
 
     def __init__(self, *args, **kwargs):
@@ -77,11 +117,40 @@ class AlterarStatusPeiForm(forms.Form):
 
         self.helper = FormHelper()
         self.helper.form_tag = False
-        self.helper.layout = Layout(
-            Field("status"),
-            Field("observacao"),
-        )
-  
+        self.helper.layout = Layout(Field("decisao"), Field("parecer"))
+
+    def clean(self):
+        dados = super().clean()
+        decisao = dados.get("decisao")
+        parecer = (dados.get("parecer") or "").strip()
+
+        if decisao in Pei.DECISOES_QUE_EXIGEM_PARECER and not parecer:
+            self.add_error("parecer", "O parecer é obrigatório ao devolver ou solicitar ajustes.")
+
+        dados["parecer"] = parecer
+        return dados
+
+
+class NovaVersaoPeiForm(forms.Form):
+    arquivo = forms.FileField(
+        label="Novo arquivo do PEI (PDF ou DOCX)",
+        widget=forms.ClearableFileInput(attrs={"accept": ".pdf, .docx"}),
+        error_messages={"required": "Selecione o arquivo corrigido do PEI."},
+    )
+    comentario = forms.CharField(
+        label="Comentário para o NAPNE (opcional)",
+        required=False,
+        max_length=1000,
+        widget=forms.Textarea(attrs={"rows": 3, "placeholder": "Descreva o que foi corrigido, se quiser"}),
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.layout = Layout(Field("arquivo"), Field("comentario"))
+
 
 class CadastroNapneForm(UserCreationForm):
     first_name = forms.CharField(

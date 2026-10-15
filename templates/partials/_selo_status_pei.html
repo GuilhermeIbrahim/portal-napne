@@ -1,0 +1,3 @@
+{# Selo de status do PEI. Uso: {% include "partials/_selo_status_pei.html" with tema=pei.badge_theme texto=pei.get_status_display %} #}
+{# text-bg-* garante contraste do texto (o antigo "bg-warning" deixava texto branco sobre amarelo). #}
+<span class="badge text-bg-{{ tema }}">{{ texto }}</span>
