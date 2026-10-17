@@ -22,6 +22,7 @@ def sem_acentos(texto):
     return "".join(letra for letra in decomposto if not unicodedata.combining(letra))
 
 
+# ---------------------------------------------------------------------------------- nome
 def normalizar_nome_estudante(valor):
     return _espacos(valor)
 
@@ -35,17 +36,16 @@ def validar_nome_estudante(valor):
     if len(re.findall(r"[^\W\d_]+", nome)) < 2:
         raise ValidationError("Informe o nome completo do estudante (nome e sobrenome).")
 
-MATRICULA_TAMANHO = 14
-MENSAGEM_MATRICULA = f"A matrícula tem {MATRICULA_TAMANHO} números."
 
+# ----------------------------------------------------------------------------- matrícula
 def normalizar_matricula(valor):
     """Aceita pontos, hífens e espaços na digitação e guarda só os números."""
     return re.sub(r"[\s.\-]", "", valor or "")
 
 
 def validar_matricula(valor):
-    if not re.fullmatch(rf"\d{{MATRICULA_TAMANHO}}", normalizar_matricula(valor)):
-        raise ValidationError(MENSAGEM_MATRICULA)
+    if not re.fullmatch(r"\d{14}", normalizar_matricula(valor)):
+        raise ValidationError("A matrícula deve ter apenas números, sendo 14 dígitos.")
 
 
 # --------------------------------------------------------------------------------- curso
