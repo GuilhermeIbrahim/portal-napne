@@ -634,3 +634,19 @@ html.sem-ancora-rolagem {
     white-space: pre-line;
     overflow-wrap: anywhere;
 }
+
+/* Aviso de privacidade no formulário de envio do PEI */
+.aviso-privacidade {
+    margin-bottom: 1rem;
+    padding: 0.75rem 1rem;
+    border-left: 5px solid var(--napne-azul);
+    border-radius: var(--bs-border-radius);
+    background-color: var(--bs-info-bg-subtle);
+    color: var(--bs-info-text-emphasis);
+    font-size: 0.9rem;
+}
+
+.aviso-privacidade a {
+    color: inherit;
+    font-weight: 700;
+}
