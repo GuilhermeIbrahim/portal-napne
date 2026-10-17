@@ -9,7 +9,14 @@ class EnvioEAcompanhamentoDoProfessorTests(BaseTestes):
         self.client.force_login(self.professor)
         resposta = self.client.post(
             reverse('enviar_pei'),
-            {'titulo': 'PEI de História', 'arquivo': arquivo_pdf('historia.pdf')},
+            {
+                'titulo': 'PEI de História',
+                'estudante_nome': 'Joana Pereira de Souza',
+                'estudante_matricula': '20231012345678',
+                'estudante_curso': 'Técnico em Informática',
+                'periodo_letivo': '2026.1',
+                'arquivo': arquivo_pdf('historia.pdf'),
+            },
             follow=True,
         )
         self.assertRedirects(resposta, reverse('meus_peis'))
@@ -203,7 +210,7 @@ class NotificacaoDaAnaliseTests(BaseTestes):
 
         self.client.force_login(self.professor)
         dados = self.client.get(reverse('api_notificacoes_novas'), {'desde': base.id}).json()
-        self.assertEqual([n['titulo'] for n in dados['novas']], [f'PEI devolvido: {self.pei.titulo}'])
+        self.assertEqual([n['titulo'] for n in dados['novas']], [f'PEI devolvido (nº {self.pei.id})'])
 
         self.client.force_login(self.outro_professor)
         outros = self.client.get(reverse('api_notificacoes_novas'), {'desde': base.id}).json()
