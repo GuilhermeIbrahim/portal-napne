@@ -9,11 +9,11 @@ from django.db import models, transaction
 from django.db.models import Q
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
-from django.utils.text import Truncator
-from django_ckeditor_5.fields import CKEditor5Field
 from django.urls import reverse
+from django_ckeditor_5.fields import CKEditor5Field
 
 from .storage import armazenamento_privado_pei
+
 
 class Usuario(AbstractUser):
     pass
