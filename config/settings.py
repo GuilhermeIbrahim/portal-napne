@@ -175,6 +175,8 @@ MAILERS = {
 MEDIA_URL = '/media/'
 MEDIA_ROOT = Path(config('MEDIA_ROOT', default=str(BASE_DIR / 'media')))
 
+PEI_ARMAZENAMENTO_PRIVADO = Path(config('PEI_ARMAZENAMENTO_PRIVADO', default=str(BASE_DIR / 'media_privada')))
+
 COMPONENTS = {"dirs": [], "app_dirs": ["components"], "autodiscover": True}
 
 ADMINLTE = {
