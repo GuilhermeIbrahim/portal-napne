@@ -1,12 +1,19 @@
+import os
+import re
+import uuid
+
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import models, transaction
 from django.db.models import Q
-from django.urls import reverse
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
 from django.utils.text import Truncator
 from django_ckeditor_5.fields import CKEditor5Field
+from django.urls import reverse
 
+from .storage import armazenamento_privado_pei
 
 class Usuario(AbstractUser):
     pass
@@ -19,6 +26,13 @@ class Noticia(models.Model):
 
     def __str__(self):
         return self.titulo
+
+def caminho_arquivo_pei(instance, filename):
+    extensao = os.path.splitext(filename)[1].lower()
+    if not re.fullmatch(r"\.[a-z0-9]{1,5}", extensao):
+        extensao = ""
+    return f"pei/{uuid.uuid4().hex}{extensao}"
+
 
 class TransicaoPeiInvalida(Exception):
     """A operação não é permitida no status atual do PEI (ex.: analisar um PEI que não está em análise)."""
@@ -58,10 +72,16 @@ class Pei(models.Model):
     STATUS_AGUARDANDO_NOVA_VERSAO = (DEVOLVIDO, AJUSTES_SOLICITADOS)
 
     titulo = models.CharField(max_length=100)
-    arquivo = models.FileField(upload_to="pei")
+    arquivo = models.FileField(upload_to=caminho_arquivo_pei, storage=armazenamento_privado_pei)
     data_envio = models.DateField(auto_now_add=True)
     professor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=EM_ANALISE)
+
+    estudante_nome = models.CharField("Nome do estudante", max_length=150, blank=True, default="")
+    estudante_matricula = models.CharField("Matrícula do estudante", max_length=20, blank=True, default="")
+    estudante_curso = models.CharField("Curso do estudante", max_length=100, blank=True, default="")
+    periodo_letivo = models.CharField("Período letivo", max_length=6, blank=True, default="")
+
 
     def __str__(self):
         return self.titulo
@@ -159,21 +179,23 @@ class Pei(models.Model):
         textos = {
             self.ANALISADO: (
                 "PEI analisado",
-                "O NAPNE concluiu a análise do PEI \"{titulo}\". Abra o PEI para ler o parecer.",
+                "O NAPNE concluiu a análise do seu PEI nº {numero}, enviado em {data}. Abra o PEI para ler o parecer.",
             ),
             self.DEVOLVIDO: (
                 "PEI devolvido",
-                "O NAPNE devolveu o PEI \"{titulo}\". Abra o PEI para ler o parecer e enviar uma nova versão.",
+                "O NAPNE devolveu o seu PEI nº {numero}, enviado em {data}. ",
+                "Abra o PEI para ler o parecer e enviar uma nova versão.",
             ),
             self.AJUSTES_SOLICITADOS: (
                 "Ajustes solicitados no PEI",
-                "O NAPNE solicitou ajustes no PEI \"{titulo}\". Abra o PEI para ler o parecer e enviar uma nova versão.",
+                "O NAPNE solicitou ajustes no seu PEI nº {numero}, enviado em {data}. ",
+                "Abra o PEI para ler o parecer e enviar uma nova versão.",
             ),
         }
         cabecalho, corpo = textos[novo_status]
         Notificacao.objects.create(
-            titulo=Truncator(f"{cabecalho}: {self.titulo}").chars(100),
-            conteudo=corpo.format(titulo=self.titulo),
+            titulo=f"{cabecalho} (nº {self.id})",
+            conteudo=corpo.format(numero=self.id, data=self.data_envio.strftime("%d/%m/%Y")),
             destino_tipo=Notificacao.USUARIO,
             destinatario=self.professor,
             remetente=remetente,
@@ -184,7 +206,7 @@ class Pei(models.Model):
 class VersaoPei(models.Model):
     pei = models.ForeignKey(Pei, on_delete=models.CASCADE, related_name="versoes")
     numero = models.PositiveIntegerField()
-    arquivo = models.FileField(upload_to="pei")
+    arquivo = models.FileField(upload_to=caminho_arquivo_pei, storage=armazenamento_privado_pei)
     enviado_por = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
     enviado_em = models.DateTimeField(auto_now_add=True)
     comentario = models.TextField(blank=True)
@@ -194,6 +216,10 @@ class VersaoPei(models.Model):
         constraints = [
             models.UniqueConstraint(fields=["pei", "numero"], name="unique_numero_de_versao_por_pei"),
         ]
+
+    def nome_do_download(self):
+        extensao = os.path.splitext(self.arquivo.name)[1].lower()
+        return f"PEI-{self.pei_id}-v{self.numero}{extensao}"
 
     def __str__(self):
         return f"{self.pei.titulo} (versão {self.numero})"
@@ -233,6 +259,53 @@ class HistoricoPei(models.Model):
     def __str__(self):
         return f"{self.pei.titulo}: {self.status_anterior} → {self.status_novo}"
     
+class RegistroAcessoPei(models.Model):
+    VISUALIZOU = "visualizou"
+    BAIXOU = "baixou"
+    ACAO_CHOICES = [
+        (VISUALIZOU, "Visualizou o PEI"),
+        (BAIXOU, "Baixou o arquivo"),
+    ]
+
+    pei_id = models.PositiveIntegerField("PEI nº", db_index=True)
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name="+")
+    acao = models.CharField("Ação", max_length=12, choices=ACAO_CHOICES)
+    versao_numero = models.PositiveIntegerField("Versão", null=True, blank=True)
+    criado_em = models.DateTimeField("Quando", auto_now_add=True)
+
+    class Meta:
+        ordering = ["-criado_em", "-id"]
+        verbose_name = "registro de acesso a PEI"
+        verbose_name_plural = "registros de acesso a PEIs"
+
+    @classmethod
+    def registrar(cls, usuario, pei, acao, versao=None):
+        return cls.objects.create(
+            pei_id=pei.id,
+            usuario=usuario if getattr(usuario, "is_authenticated", False) else None,
+            acao=acao,
+            versao_numero=versao.numero if versao else None,
+        )
+
+    def __str__(self):
+        return f"PEI nº {self.pei_id}: {self.get_acao_display()}"
+
+
+def _apagar_arquivo_se_ninguem_usa(storage, nome):
+    if not nome:
+        return
+    if Pei.objects.filter(arquivo=nome).exists() or VersaoPei.objects.filter(arquivo=nome).exists():
+        return
+    storage.delete(nome)
+
+
+@receiver(post_delete, sender=VersaoPei)
+@receiver(post_delete, sender=Pei)
+def apagar_arquivos_ao_excluir(sender, instance, **kwargs):
+    storage = instance.arquivo.storage
+    nome = instance.arquivo.name
+    transaction.on_commit(lambda: _apagar_arquivo_se_ninguem_usa(storage, nome))
+
 class SolicitacaoNapne(models.Model):
     PENDENTE = "pendente"
     APROVADO = "aprovado"
