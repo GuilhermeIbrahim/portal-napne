@@ -1,0 +1,82 @@
+{% extends "portal/base.html" %}
+
+{% block title %}Aviso de Privacidade | Portal NAPNE{% endblock %}
+
+{% block content %}
+
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            <h1 class="h3 titulo-secao mb-4">Aviso de Privacidade</h1>
+
+            <p class="lead">
+                Este aviso explica como o Portal NAPNE trata dados pessoais, em especial os dados dos
+                estudantes informados no envio do Plano Educacional Individualizado (PEI), conforme a
+                Lei Geral de Proteção de Dados (Lei nº 13.709/2018, a LGPD).
+            </p>
+
+            <h2 class="h5 mt-4">Quem trata os dados</h2>
+            <p>
+                O tratamento é feito pelo Instituto Federal do Rio Grande do Norte (IFRN), Campus São Paulo
+                do Potengi, por meio do Núcleo de Atendimento às Pessoas com Necessidades Educacionais
+                Específicas (NAPNE).
+            </p>
+
+            <h2 class="h5 mt-4">Quais dados são tratados</h2>
+            <ul>
+                <li><strong>Identificação do estudante no PEI:</strong> nome, matrícula, curso e período letivo.</li>
+                <li>
+                    <strong>O arquivo do PEI:</strong> pode conter informações sobre deficiência, saúde e necessidades
+                    educacionais específicas, que a LGPD classifica como dados pessoais sensíveis.
+                </li>
+                <li><strong>Dados de quem envia:</strong> nome e usuário institucional do professor, obtidos pelo SUAP.</li>
+                <li><strong>Andamento do PEI:</strong> status, pareceres do NAPNE e versões enviadas.</li>
+                <li><strong>Registro de acessos:</strong> quem visualizou ou baixou cada PEI e quando (sem guardar endereço IP).</li>
+            </ul>
+
+            <h2 class="h5 mt-4">Para que usamos</h2>
+            <p>
+                Exclusivamente para receber, analisar e acompanhar os PEIs e prestar o atendimento educacional
+                especializado, em apoio à educação inclusiva (Lei nº 13.146/2015 e Resolução CNE/CEB nº 4/2009).
+                Os dados não são usados para outras finalidades. Quando o estudante for criança ou adolescente,
+                o tratamento é feito em seu melhor interesse.
+            </p>
+
+            <h2 class="h5 mt-4">Fundamento legal</h2>
+            <p>
+                O tratamento é necessário à execução de política pública de educação inclusiva pelo IFRN
+                (LGPD, art. 7º, III, e art. 11, II, "b"; e art. 23).
+            </p>
+
+            <h2 class="h5 mt-4">Quem pode acessar</h2>
+            <p>
+                Apenas o professor que enviou o PEI e os servidores do NAPNE. Os dados não aparecem em páginas
+                públicas, em endereços (URLs) nem em avisos do portal, e não são compartilhados com terceiros.
+            </p>
+
+            <h2 class="h5 mt-4">Como protegemos</h2>
+            <ul>
+                <li>Controle de acesso por perfil (professor dono do PEI e NAPNE).</li>
+                <li>Arquivos de PEI guardados em área privada do servidor, sem endereço público, com nome aleatório.</li>
+                <li>Registro de quem acessa cada PEI.</li>
+                <li>Pedimos que diagnósticos e laudos não sejam escritos nos campos de identificação nem no título.</li>
+            </ul>
+
+            <h2 class="h5 mt-4">Por quanto tempo guardamos</h2>
+            <p>
+                Pelo tempo necessário ao acompanhamento educacional do estudante, conforme as regras de guarda de
+                documentos do IFRN. Quando um PEI é excluído, os arquivos dele também são apagados do servidor.
+            </p>
+
+            <h2 class="h5 mt-4">Seus direitos</h2>
+            <p>
+                Você pode pedir confirmação do tratamento, acesso, correção de dados incompletos ou incorretos,
+                eliminação, informação sobre com quem os dados são compartilhados e revisão de decisões
+                (LGPD, art. 18). Para exercer esses direitos, procure o NAPNE do Campus São Paulo do Potengi ou o
+                encarregado pelo tratamento de dados pessoais do IFRN, cujo contato está no site oficial do IFRN.
+            </p>
+
+            <a href="{% url 'index' %}" class="btn btn-outline-secondary mt-3">Voltar para o início</a>
+        </div>
+    </div>
+
+{% endblock %}

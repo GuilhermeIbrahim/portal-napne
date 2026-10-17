@@ -1,0 +1,13 @@
+<dl class="row mb-0">
+    <dt class="col-sm-4">Estudante</dt>
+    <dd class="col-sm-8">{{ pei.estudante_nome|default:"Não informado" }}</dd>
+
+    <dt class="col-sm-4">Matrícula</dt>
+    <dd class="col-sm-8">{{ pei.estudante_matricula|default:"Não informada" }}</dd>
+
+    <dt class="col-sm-4">Curso</dt>
+    <dd class="col-sm-8">{{ pei.estudante_curso|default:"Não informado" }}</dd>
+
+    <dt class="col-sm-4">Período letivo</dt>
+    <dd class="col-sm-8 mb-0">{{ pei.periodo_letivo|default:"Não informado" }}</dd>
+</dl>

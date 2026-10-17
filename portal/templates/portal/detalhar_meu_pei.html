@@ -1,6 +1,6 @@
 {% extends "portal/base.html" %}
 
-{% block title %}{{ pei.titulo }} | Portal NAPNE{% endblock %}
+{% block title %}PEI nº {{ pei.id }} | Portal NAPNE{% endblock %}
 
 {% block content %}
 
@@ -25,6 +25,13 @@
             <p class="mb-0"><strong>Versão atual do arquivo:</strong> {{ pei.versao_atual.numero }}</p>
         </div>
         <div class="card-footer bg-white d-flex flex-wrap gap-2">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white"><h2 class="h6 mb-0">Dados do estudante</h2></div>
+                <div class="card-body">
+                    {% include "partials/_dados_estudante_pei.html" %}
+                </div>
+            </div>
+
             {% if pei.aguarda_nova_versao %}
                 <a href="{% url 'reenviar_pei' pei.id %}" class="btn btn-primary">
                     <i class="bi bi-upload" aria-hidden="true"></i> Enviar nova versão
