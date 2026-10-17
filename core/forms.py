@@ -14,7 +14,6 @@ from .models import (
     Notificacao,
     Pei,
 )
-
 from .validators import (
     MENSAGEM_TITULO_REVELA_ESTUDANTE,
     normalizar_curso,

@@ -6,8 +6,27 @@ from django.utils import timezone
 
 from .decorators import napne_required
 from .downloads import resposta_de_download
-from .forms import AnalisePeiForm, ApresentacaoNapneForm, EditarPeiForm, ImagemCarrosselFormSet, NoticiaForm, NotificacaoForm
-from .models import ApresentacaoNapne, FeedbackPrivado, Noticia, Notificacao, Pei, SolicitacaoNapne, TransicaoPeiInvalida, VersaoPei
+from .forms import (
+    AnalisePeiForm,
+    ApresentacaoNapneForm,
+    EditarPeiForm,
+    ImagemCarrosselFormSet,
+    NoticiaForm,
+    NotificacaoForm,
+)
+from .models import (
+    ApresentacaoNapne,
+    FeedbackPrivado,
+    Noticia,
+    Notificacao,
+    Pei,
+    RegistroAcessoPei,
+    SolicitacaoNapne,
+    TransicaoPeiInvalida,
+    VersaoPei,
+)
+from .validators import normalizar_periodo_letivo
+
 
 @napne_required
 def painel_home(request):
@@ -53,6 +72,7 @@ def excluir_noticia(request, id):
 @napne_required
 def listar_peis(request):
     status = request.GET.get('status', '')
+    periodo = normalizar_periodo_letivo(request.GET.get('periodo', ''))
     peis = Pei.objects.select_related('professor').annotate(ultima_versao=Max('versoes__numero')).order_by('-data_envio', '-id')
 
     if status in dict(Pei.STATUS_CHOICES):
@@ -60,10 +80,20 @@ def listar_peis(request):
     else:
         status = ''
 
+    periodos_existentes = list(
+        Pei.objects.exclude(periodo_letivo='').order_by('-periodo_letivo').values_list('periodo_letivo', flat=True).distinct()
+    )
+    if periodo in periodos_existentes:
+        peis = peis.filter(periodo_letivo=periodo)
+    else:
+        periodo = ''
+
     context = {
         'peis': peis,
         'status_atual': status,
         'status_choices': Pei.STATUS_CHOICES,
+        'periodo_atual': periodo,
+        'periodos': periodos_existentes,
     }
     return render(request, 'core/listar_peis.html', context)
 
@@ -77,7 +107,6 @@ def excluir_pei(request, id):
 
 @napne_required
 def detalhar_pei(request, id):
-    """Detalhe do PEI + registro da análise (POST) pelo NAPNE."""
     pei = get_object_or_404(Pei.objects.select_related('professor'), id=id)
     form = AnalisePeiForm()
 
@@ -108,6 +137,9 @@ def detalhar_pei(request, id):
             )
             return redirect('detalhar_pei', id=pei.id)
 
+    if request.method == 'GET':
+        RegistroAcessoPei.registrar(request.user, pei, RegistroAcessoPei.VISUALIZOU)
+
     context = {
         'pei': pei,
         'form': form,
@@ -130,14 +162,16 @@ def editar_pei(request, id):
 
 @napne_required
 def baixar_pei(request, id):
-    """Baixa o arquivo da versão mais recente do PEI."""
     pei = get_object_or_404(Pei, id=id)
-    return resposta_de_download(pei.arquivo)
+    versao = pei.versao_atual
+    RegistroAcessoPei.registrar(request.user, pei, RegistroAcessoPei.BAIXOU, versao)
+    return resposta_de_download(pei.arquivo, versao.nome_do_download() if versao else None)
 
 @napne_required
 def baixar_versao_pei(request, versao_id):
-    versao = get_object_or_404(VersaoPei, id=versao_id)
-    return resposta_de_download(versao.arquivo)
+    versao = get_object_or_404(VersaoPei.objects.select_related('pei'), id=versao_id)
+    RegistroAcessoPei.registrar(request.user, versao.pei, RegistroAcessoPei.BAIXOU, versao)
+    return resposta_de_download(versao.arquivo, versao.nome_do_download())
 
 @napne_required
 def solicitacoes_napne(request):

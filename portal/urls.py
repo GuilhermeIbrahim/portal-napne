@@ -25,4 +25,5 @@ urlpatterns = [
     path('minhas-notificacoes/', views.minhas_notificacoes, name='minhas_notificacoes'),
     path('api/noticias/novas/', views.api_noticias_novas, name='api_noticias_novas'),
     path('api/notificacoes/novas/', views.api_notificacoes_novas, name='api_notificacoes_novas'),
+    path('privacidade/', views.privacidade, name='privacidade'),
 ]
