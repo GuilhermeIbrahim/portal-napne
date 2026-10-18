@@ -14,6 +14,18 @@ from .models import (
     Notificacao,
     Pei,
 )
+from .validators import (
+    MENSAGEM_TITULO_REVELA_ESTUDANTE,
+    normalizar_curso,
+    normalizar_matricula,
+    normalizar_nome_estudante,
+    normalizar_periodo_letivo,
+    titulo_revela_o_estudante,
+    validar_curso,
+    validar_matricula,
+    validar_nome_estudante,
+    validar_periodo_letivo,
+)
 
 
 class NoticiaForm(forms.ModelForm):
@@ -40,13 +52,98 @@ class NoticiaForm(forms.ModelForm):
             Div(Field("conteudo"), css_class="mb-3"),
         )
 
-class PeiForm(forms.ModelForm):
+CAMPOS_DO_ESTUDANTE = ["estudante_nome", "estudante_matricula", "estudante_curso", "periodo_letivo"]
+
+class DadosDoEstudanteMixin:
+    AJUDA_NAO_ESCREVER_SAUDE = "Não escreva diagnóstico, laudo nem outras informações de saúde aqui."
+
+    def configurar_campos_do_estudante(self):
+        configuracao = {
+            "estudante_nome": dict(
+                label="Nome completo do estudante",
+                help_text="Nome e sobrenome. " + self.AJUDA_NAO_ESCREVER_SAUDE,
+                placeholder="Ex.: Maria da Silva Souza",
+                autocomplete="off",
+            ),
+            "estudante_matricula": dict(
+                label="Matrícula do estudante",
+                help_text="14 números. Pontos e hífens digitados são removidos.",
+                placeholder="Ex.: 20231012345678",
+                autocomplete="off",
+                inputmode="numeric",
+            ),
+            "estudante_curso": dict(
+                label="Curso do estudante",
+                help_text="Ex.: Técnico em Informática integrado ao Ensino Médio.",
+                placeholder="Nome do curso",
+                autocomplete="off",
+            ),
+            "periodo_letivo": dict(
+                label="Período letivo",
+                help_text="Formato ano.semestre, por exemplo 2026.1 ou 2026.2.",
+                placeholder="2026.1",
+                autocomplete="off",
+                inputmode="decimal",
+            ),
+        }
+        for nome, dados in configuracao.items():
+            campo = self.fields[nome]
+            campo.required = True
+            campo.label = dados["label"]
+            campo.help_text = dados["help_text"]
+            campo.error_messages["required"] = f"Informe {self._artigo(nome)} {dados['label'].lower()}."
+            campo.widget.attrs.update({
+                "placeholder": dados["placeholder"],
+                "autocomplete": dados["autocomplete"],
+            })
+            if "inputmode" in dados:
+                campo.widget.attrs["inputmode"] = dados["inputmode"]
+
+    @staticmethod
+    def _artigo(nome_do_campo):
+        return "a" if nome_do_campo == "estudante_matricula" else "o"
+
+    def clean_estudante_nome(self):
+        valor = normalizar_nome_estudante(self.cleaned_data["estudante_nome"])
+        validar_nome_estudante(valor)
+        return valor
+
+    def clean_estudante_matricula(self):
+        valor = normalizar_matricula(self.cleaned_data["estudante_matricula"])
+        validar_matricula(valor)
+        return valor
+
+    def clean_estudante_curso(self):
+        valor = normalizar_curso(self.cleaned_data["estudante_curso"])
+        validar_curso(valor)
+        return valor
+
+    def clean_periodo_letivo(self):
+        valor = normalizar_periodo_letivo(self.cleaned_data["periodo_letivo"])
+        validar_periodo_letivo(valor)
+        return valor
+
+    def clean(self):
+        dados = super().clean()
+        titulo = dados.get("titulo")
+        nome = dados.get("estudante_nome")
+        matricula = dados.get("estudante_matricula", "")
+
+        if titulo and nome and titulo_revela_o_estudante(titulo, nome, matricula):
+            self.add_error("titulo", MENSAGEM_TITULO_REVELA_ESTUDANTE)
+        return dados
+
+
+class PeiForm(DadosDoEstudanteMixin, forms.ModelForm):
     class Meta:
         model = Pei
-        fields = ["titulo", "arquivo"]
+        fields = ["titulo", *CAMPOS_DO_ESTUDANTE, "arquivo"]
         labels = {
-            "titulo": "Título",
+            "titulo": "Título do PEI",
             "arquivo": "Arquivo do PEI (PDF ou DOCX)",
+        }
+        help_texts = {
+            "titulo": "Não use o nome do estudante. Ex.: \"PEI de Matemática - 7º ano\".",
         }
         widgets = {
             "titulo": forms.TextInput(attrs={"placeholder": "Título do PEI"}),
@@ -55,33 +152,48 @@ class PeiForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.configurar_campos_do_estudante()
 
         self.helper = FormHelper()
         self.helper.form_tag = False
         self.helper.layout = Layout(
+            HTML('<h2 class="h6 secao-formulario">Identificação do estudante</h2>'),
+            HTML('{% include "portal/partials/_aviso_privacidade_pei.html" %}'),
+            Field("estudante_nome"),
+            Row(
+                Column(Field("estudante_matricula"), css_class="col-md-6"),
+                Column(Field("periodo_letivo"), css_class="col-md-6"),
+            ),
+            Field("estudante_curso"),
+            HTML('<h2 class="h6 secao-formulario">Documento</h2>'),
             Field("titulo"),
             Field("arquivo"),
         )
 
-class EditarPeiForm(forms.ModelForm):
-    """
-    O NAPNE só corrige o título. O arquivo pertence ao professor: para trocá-lo, ele envia uma
-    nova versão (assim o histórico de versões nunca é alterado em silêncio).
-    """
 
+class EditarPeiForm(DadosDoEstudanteMixin, forms.ModelForm):
     class Meta:
         model = Pei
-        fields = ["titulo"]
-        labels = {"titulo": "Título"}
+        fields = ["titulo", *CAMPOS_DO_ESTUDANTE]
+        labels = {"titulo": "Título do PEI"}
+        help_texts = {"titulo": "Não use o nome do estudante."}
         widgets = {"titulo": forms.TextInput(attrs={"placeholder": "Título do PEI"})}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.configurar_campos_do_estudante()
 
         self.helper = FormHelper()
         self.helper.form_tag = False
-        self.helper.layout = Layout(Field("titulo"))
-
+        self.helper.layout = Layout(
+            Field("estudante_nome"),
+            Row(
+                Column(Field("estudante_matricula"), css_class="col-md-6"),
+                Column(Field("periodo_letivo"), css_class="col-md-6"),
+            ),
+            Field("estudante_curso"),
+            Field("titulo"),
+        )
 
 class AnalisePeiForm(forms.Form):
     PARECER_MAX = 2000

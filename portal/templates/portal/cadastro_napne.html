@@ -39,10 +39,10 @@
                         {% csrf_token %}
                         {% crispy form form.helper %}
                         <div class="d-flex flex-wrap gap-2 mt-4">
-                            <button type="submit" class="btn btn-primary btn-lg">
+                            <button type="submit" class="btn btn-primary">
                                 <i class="bi bi-person-plus" aria-hidden="true"></i> Criar minha conta
                             </button>
-                            <a href="{% url 'index' %}" class="btn btn-outline-secondary btn-lg">Cancelar</a>
+                            <a href="{% url 'index' %}" class="btn btn-outline-secondary">Cancelar</a>
                         </div>
                     </form>
                 </div>

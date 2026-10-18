@@ -14,7 +14,8 @@ from django.urls import NoReverseMatch, reverse
 from .forms import AnalisePeiForm, EditarPeiForm, NovaVersaoPeiForm
 from .models import HistoricoPei, Notificacao, Pei, TransicaoPeiInvalida
 
-MEDIA_TESTE = tempfile.mkdtemp(prefix='napne-testes-')
+MEDIA_TESTE = tempfile.mkdtemp(prefix='napne-testes-media-')
+PRIVADO_TESTE = tempfile.mkdtemp(prefix='napne-testes-privado-')
 
 # Hash de senha rápido só nos testes (o padrão do Django é lento de propósito e multiplicava o tempo da suíte).
 HASH_RAPIDO = ['django.contrib.auth.hashers.MD5PasswordHasher']
@@ -34,13 +35,13 @@ def arquivo_pdf(nome='pei.pdf', conteudo=b'%PDF-1.4 conteudo de teste'):
 def criar_pei(professor, titulo='PEI de Matemática', **extra):
     return Pei.objects.create(titulo=titulo, arquivo=arquivo_pdf(), professor=professor, **extra)
 
-
-@override_settings(MEDIA_ROOT=MEDIA_TESTE, PASSWORD_HASHERS=HASH_RAPIDO)
+@override_settings(MEDIA_ROOT=MEDIA_TESTE, PEI_ARMAZENAMENTO_PRIVADO=PRIVADO_TESTE, PASSWORD_HASHERS=HASH_RAPIDO)
 class BaseTestes(TestCase):
     @classmethod
     def tearDownClass(cls):
         super().tearDownClass()
         shutil.rmtree(MEDIA_TESTE, ignore_errors=True)
+        shutil.rmtree(PRIVADO_TESTE, ignore_errors=True)
 
     def setUp(self):
         self.professor = usuario('prof', 'Servidor')
@@ -250,8 +251,10 @@ class FormulariosDoFluxoTests(TestCase):
         self.assertFalse(form.is_valid())
         self.assertEqual(form.errors['arquivo'], ['Selecione o arquivo corrigido do PEI.'])
 
-    def test_edicao_do_pei_so_tem_o_titulo(self):
-        self.assertEqual(list(EditarPeiForm().fields), ['titulo'])
+    def test_edicao_do_pei_nunca_inclui_o_arquivo(self):
+        campos = list(EditarPeiForm().fields)
+        self.assertNotIn('arquivo', campos)
+        self.assertEqual(campos, ['titulo', 'estudante_nome', 'estudante_matricula', 'estudante_curso', 'periodo_letivo'])
 
 
 class AnaliseNoPainelTests(BaseTestes):
@@ -389,12 +392,19 @@ class ListagemEEdicaoDePeisTests(BaseTestes):
         self.client.force_login(self.professor)
         self.assertEqual(self.client.get(reverse('listar_peis')).status_code, 403)
 
-    def test_editar_so_altera_o_titulo_e_nunca_o_arquivo(self):
+    def test_editar_so_altera_os_dados_e_nunca_o_arquivo(self):
         arquivo_antes = self.pei.arquivo.name
         resposta = self.client.post(
-            reverse('editar_pei', args=[self.pei.id]),
-            {'titulo': 'Novo título', 'arquivo': arquivo_pdf('intruso.pdf', b'%PDF-1.4 intruso')},
-        )
+             reverse('editar_pei', args=[self.pei.id]),
+            {
+                'titulo': 'Novo título',
+                'estudante_nome': 'Joana Pereira de Souza',
+                'estudante_matricula': '20231012345678',
+                'estudante_curso': 'Técnico em Informática',
+                'periodo_letivo': '2026.1',
+                'arquivo': arquivo_pdf('intruso.pdf', b'%PDF-1.4 intruso'),
+            },
+         )
         self.assertEqual(resposta.status_code, 302)
         self.pei.refresh_from_db()
         self.assertEqual(self.pei.titulo, 'Novo título')

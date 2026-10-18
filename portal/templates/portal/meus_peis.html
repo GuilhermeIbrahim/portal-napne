@@ -23,6 +23,8 @@
             <table class="table table-hover align-middle">
                 <thead>
                     <tr>
+                        <th>Estudante</th>
+                        <th>Período</th>
                         <th>Título</th>
                         <th>Data de envio</th>
                         <th>Status</th>
@@ -32,6 +34,8 @@
                 <tbody>
                     {% for pei in peis %}
                     <tr>
+                        <td>{{ pei.estudante_nome|default:"Não informado" }}</td>
+                        <td>{{ pei.periodo_letivo|default:"—" }}</td>
                         <td>{{ pei.titulo }}</td>
                         <td>{{ pei.data_envio|date:"d/m/Y" }}</td>
                         <td>

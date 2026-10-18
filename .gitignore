@@ -26,6 +26,7 @@ share/python-wheels/
 *.egg
 MANIFEST
 media/
+media_privada/
 staticfiles/
 
 # PyInstaller

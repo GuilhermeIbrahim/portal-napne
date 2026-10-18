@@ -31,6 +31,7 @@ from core.models import (
     Noticia,
     Notificacao,
     Pei,
+    RegistroAcessoPei,
     SolicitacaoNapne,
     TransicaoPeiInvalida,
     VersaoPei,
@@ -141,7 +142,12 @@ def baixar_minha_versao_pei(request, versao_id):
     versao = get_object_or_404(VersaoPei.objects.select_related('pei'), id=versao_id)
     if versao.pei.professor_id != request.user.id:
         raise PermissionDenied("Você não tem permissão para acessar o PEI de outro professor.")
-    return resposta_de_download(versao.arquivo)
+    RegistroAcessoPei.registrar(request.user, versao.pei, RegistroAcessoPei.BAIXOU, versao)
+    return resposta_de_download(versao.arquivo, versao.nome_do_download())
+
+
+def privacidade(request):
+    return render(request, 'portal/privacidade.html')
 
 def pesquisar_noticias(request):
     termo = request.GET.get('q', '').strip()

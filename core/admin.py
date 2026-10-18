@@ -8,6 +8,7 @@ from .models import (
     Noticia,
     Notificacao,
     Pei,
+    RegistroAcessoPei,
     SolicitacaoNapne,
     Usuario,
     VersaoPei,
@@ -25,8 +26,12 @@ class VersaoPeiInline(admin.TabularInline):
     model = VersaoPei
     extra = 0
     can_delete = False
-    fields = ('numero', 'arquivo', 'enviado_por', 'enviado_em', 'comentario')
+    fields = ('numero', 'arquivo_privado', 'enviado_por', 'enviado_em', 'comentario')
     readonly_fields = fields
+
+    @admin.display(description='Arquivo')
+    def arquivo_privado(self, versao):
+        return f'{versao.nome_do_download()} (área privada)' if versao.pk else '-'
 
     def has_add_permission(self, request, obj=None):
         return False
@@ -45,17 +50,15 @@ class HistoricoPeiInline(admin.TabularInline):
 
 @admin.register(Pei)
 class PeiAdmin(admin.ModelAdmin):
-    list_display = ('titulo', 'status', 'data_envio', 'professor')
-    list_filter = ('status', 'data_envio', 'professor')
+    list_display = ('titulo', 'estudante_nome', 'periodo_letivo', 'status', 'data_envio', 'professor')
+    list_filter = ('status', 'periodo_letivo', 'data_envio', 'professor')
     search_fields = ('titulo',)
     inlines = [VersaoPeiInline, HistoricoPeiInline]
+    exclude = ('arquivo',)  
+    readonly_fields = ('status',)
 
-    def get_readonly_fields(self, request, obj=None):
-        # Status e arquivo só mudam pelo fluxo de análise/nova versão; assim o histórico não fica incoerente.
-        if obj:
-            return ('status', 'arquivo')
-        return ()
-
+    def has_add_permission(self, request):
+        return False
 
 @admin.register(SolicitacaoNapne)
 class SolicitacaoNapneAdmin(admin.ModelAdmin):
@@ -86,3 +89,20 @@ class NotificacaoAdmin(admin.ModelAdmin):
 class HistoricoPeiAdmin(admin.ModelAdmin):
     list_display = ('pei', 'status_anterior', 'status_novo', 'alterado_por', 'alterado_em')
     list_filter = ('status_novo',)
+
+@admin.register(RegistroAcessoPei)
+class RegistroAcessoPeiAdmin(admin.ModelAdmin):
+    """Trilha de auditoria: só leitura. Ninguém altera nem apaga registros pelo admin."""
+
+    list_display = ('criado_em', 'pei_id', 'acao', 'versao_numero', 'usuario')
+    list_filter = ('acao', 'criado_em')
+    date_hierarchy = 'criado_em'
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
