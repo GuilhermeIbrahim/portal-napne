@@ -1,3 +1,5 @@
+import re
+
 from django.urls import reverse
 
 from core.models import Notificacao, Pei
@@ -225,3 +227,54 @@ class PaginaDeAcessoNegadoTests(BaseTestes):
         self.assertContains(resposta, 'Acesso restrito', status_code=403)
         self.assertContains(resposta, 'navbar-napne', status_code=403)      # layout do portal
         self.assertNotContains(resposta, 'app-sidebar', status_code=403)    # sem o menu do painel
+
+
+class BotoesEEstruturaDoDetalheDoProfessorTests(BaseTestes):
+    """Os botões do rodapé seguem o tamanho pequeno do resto do sistema e o rodapé só tem botões."""
+
+    def html_do_detalhe(self, devolvido=False):
+        if devolvido:
+            self.pei.registrar_analise(Pei.DECISAO_DEVOLVER, 'Corrija o item 3.', self.napne)
+        self.client.force_login(self.professor)
+        return self.client.get(reverse('detalhar_meu_pei', args=[self.pei.id])).content.decode()
+
+    def rodape(self, html):
+        inicio = html.index('class="card-footer')
+        fim = html.index('</div>', inicio)
+        return html[inicio:fim], fim
+
+    def test_rodape_so_tem_botoes_e_o_cartao_dos_dados_vem_depois_dele(self):
+        for devolvido in (False, True):
+            html = self.html_do_detalhe(devolvido)
+            rodape, fim = self.rodape(html)
+            self.assertNotIn('card-header', rodape)       # nenhum cartão dentro do rodapé
+            self.assertNotIn('Dados do estudante', rodape)
+            self.assertGreater(html.index('Dados do estudante'), fim)
+
+    def test_botoes_do_rodape_sao_pequenos(self):
+        for devolvido in (False, True):
+            rodape, _ = self.rodape(self.html_do_detalhe(devolvido))
+            botoes = re.findall(r'class="(btn [^"]*)"', rodape)
+            self.assertGreaterEqual(len(botoes), 2)
+            for classes in botoes:
+                self.assertIn('btn-sm', classes)
+
+    def test_reenvio_so_aparece_quando_devolvido_mas_continua_pequeno(self):
+        rodape, _ = self.rodape(self.html_do_detalhe(devolvido=True))
+        self.assertIn('Enviar nova versão', rodape)
+        self.assertIn('btn btn-sm btn-primary', rodape)
+
+    def test_nenhuma_tela_do_portal_usa_botao_gigante(self):
+        self.pei.registrar_analise(Pei.DECISAO_DEVOLVER, 'x', self.napne)
+        paginas = [
+            (None, reverse('index')), (None, reverse('cadastro_napne')), (None, reverse('login_napne')),
+            (None, reverse('privacidade')),
+            (self.professor, reverse('enviar_pei')), (self.professor, reverse('meus_peis')),
+            (self.professor, reverse('detalhar_meu_pei', args=[self.pei.id])),
+            (self.professor, reverse('reenviar_pei', args=[self.pei.id])),
+        ]
+        for quem, url in paginas:
+            self.client.logout()
+            if quem:
+                self.client.force_login(quem)
+            self.assertNotIn('btn-lg', self.client.get(url).content.decode(), url)

@@ -25,24 +25,25 @@
             <p class="mb-0"><strong>Versão atual do arquivo:</strong> {{ pei.versao_atual.numero }}</p>
         </div>
         <div class="card-footer bg-white d-flex flex-wrap gap-2">
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-white"><h2 class="h6 mb-0">Dados do estudante</h2></div>
-                <div class="card-body">
-                    {% include "partials/_dados_estudante_pei.html" %}
-                </div>
-            </div>
-
             {% if pei.aguarda_nova_versao %}
-                <a href="{% url 'reenviar_pei' pei.id %}" class="btn btn-primary">
+                <a href="{% url 'reenviar_pei' pei.id %}" class="btn btn-sm btn-primary">
                     <i class="bi bi-upload" aria-hidden="true"></i> Enviar nova versão
                 </a>
             {% endif %}
-            <a href="{% url 'baixar_minha_versao_pei' pei.versao_atual.id %}" class="btn btn-outline-primary">
+            <a href="{% url 'baixar_minha_versao_pei' pei.versao_atual.id %}" class="btn btn-sm btn-outline-primary">
                 <i class="bi bi-download" aria-hidden="true"></i> Baixar arquivo atual
             </a>
-            <a href="{% url 'meus_peis' %}" class="btn btn-secondary">Voltar</a>
+            <a href="{% url 'meus_peis' %}" class="btn btn-sm btn-secondary">Voltar</a>
         </div>
     </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white"><h2 class="h6 mb-0">Dados do estudante</h2></div>
+        <div class="card-body">
+            {% include "partials/_dados_estudante_pei.html" %}
+        </div>
+    </div>
+
 
     {% if pei.aguarda_nova_versao %}
         <div class="alert alert-warning" role="status">

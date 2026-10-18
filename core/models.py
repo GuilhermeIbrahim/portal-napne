@@ -183,13 +183,11 @@ class Pei(models.Model):
             ),
             self.DEVOLVIDO: (
                 "PEI devolvido",
-                "O NAPNE devolveu o seu PEI nº {numero}, enviado em {data}. ",
-                "Abra o PEI para ler o parecer e enviar uma nova versão.",
+                "O NAPNE devolveu o seu PEI nº {numero}, enviado em {data}. Abra o PEI para ler o parecer e enviar uma nova versão.",
             ),
             self.AJUSTES_SOLICITADOS: (
                 "Ajustes solicitados no PEI",
-                "O NAPNE solicitou ajustes no seu PEI nº {numero}, enviado em {data}. ",
-                "Abra o PEI para ler o parecer e enviar uma nova versão.",
+                "O NAPNE solicitou ajustes no seu PEI nº {numero}, enviado em {data}. Abra o PEI para ler o parecer e enviar uma nova versão.",
             ),
         }
         cabecalho, corpo = textos[novo_status]
