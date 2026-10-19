@@ -192,7 +192,7 @@ ADMINLTE = {
     "assets_mode": "static",
     "footer_left": "&copy; Portal NAPNE",
     "footer_right": "IFRN &mdash; Campus São Paulo do Potengi",
-    "sidebar_docs_url": "None",
+    "sidebar_docs_url": None,
     "classes_sidebar": "shadow",
     "classes_brand_text": "",
     "menu": [
