@@ -6,7 +6,7 @@ charset-normalizer==3.5.1
 crispy-bootstrap5==2026.9
 cryptography==50.0.1
 Django==6.1.1
-django-allauth==65.19.3
+django-allauth==65.19.7
 django-allauth-suap==0.1.2
 django-ckeditor-5==0.2.20
 django-crispy-forms==2.7
