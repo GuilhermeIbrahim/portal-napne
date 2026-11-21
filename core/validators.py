@@ -1,7 +1,11 @@
+import math
+import os
 import re
 import unicodedata
+import zipfile
 from datetime import date
 
+from django.conf import settings
 from django.core.exceptions import ValidationError
 
 PARTICULAS_DE_NOME = {"da", "de", "do", "das", "dos", "e"}
@@ -101,3 +105,61 @@ def titulo_revela_o_estudante(titulo, nome, matricula=""):
         return True
 
     return False
+
+
+BYTES_POR_MB = 1024 * 1024
+EXTENSOES_DO_PEI = (".pdf", ".docx")
+
+
+def _mb_para_exibir(tamanho_em_bytes):
+    """Arredonda PARA CIMA com 1 casa (10 MB + 1 byte aparece como 10,1 MB, nunca como "10 MB" de novo)."""
+    mb = math.ceil(tamanho_em_bytes / BYTES_POR_MB * 10) / 10
+    return f"{mb:.1f}".replace(".", ",")
+
+
+def _parece_pdf(arquivo):
+    return arquivo.read(5) == b"%PDF-"
+
+
+def _parece_docx(arquivo):
+    try:
+        with zipfile.ZipFile(arquivo) as pacote:
+            nomes = set(pacote.namelist())
+    except (zipfile.BadZipFile, OSError, EOFError, ValueError):
+        return False
+    return "[Content_Types].xml" in nomes and "word/document.xml" in nomes
+
+
+def validar_arquivo_pei(arquivo):
+    """
+    Valida no servidor um arquivo de PEI: tamanho, extensão e conteúdo real (PDF ou DOCX).
+    Não confia no atributo accept do navegador nem no content_type informado pelo cliente.
+    """
+    limite_mb = settings.PEI_TAMANHO_MAXIMO_MB
+    tamanho = arquivo.size
+
+    if tamanho == 0:
+        raise ValidationError("O arquivo está vazio. Selecione o arquivo correto do PEI.")
+
+    if tamanho > limite_mb * BYTES_POR_MB:
+        raise ValidationError(
+            f"O arquivo tem {_mb_para_exibir(tamanho)} MB, mas o limite é de {limite_mb} MB. "
+            "Reduza o tamanho do arquivo e envie novamente."
+        )
+
+    extensao = os.path.splitext(arquivo.name or "")[1].lower()
+    if extensao not in EXTENSOES_DO_PEI:
+        raise ValidationError("Formato não permitido. Envie um arquivo PDF (.pdf) ou Word (.docx).")
+
+    arquivo.seek(0)
+    try:
+        conteudo_confere = _parece_pdf(arquivo) if extensao == ".pdf" else _parece_docx(arquivo)
+    finally:
+        arquivo.seek(0) 
+
+    if not conteudo_confere:
+        tipo = "PDF" if extensao == ".pdf" else "Word (.docx)"
+        raise ValidationError(
+            f"O conteúdo do arquivo não é um {tipo} válido. Ele pode estar corrompido ou ter sido "
+            f"renomeado a partir de outro formato. Abra o arquivo, salve-o como {tipo} e tente novamente."
+        )

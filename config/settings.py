@@ -177,6 +177,8 @@ MEDIA_ROOT = Path(config('MEDIA_ROOT', default=str(BASE_DIR / 'media')))
 
 PEI_ARMAZENAMENTO_PRIVADO = Path(config('PEI_ARMAZENAMENTO_PRIVADO', default=str(BASE_DIR / 'media_privada')))
 
+PEI_TAMANHO_MAXIMO_MB = config('PEI_TAMANHO_MAXIMO_MB', default=10, cast=int)
+
 COMPONENTS = {"dirs": [], "app_dirs": ["components"], "autodiscover": True}
 
 ADMINLTE = {
