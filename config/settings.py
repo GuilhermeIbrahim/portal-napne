@@ -202,6 +202,7 @@ ADMINLTE = {
     {"text": "Nova notícia", "route": "criar_noticia", "icon": "bi bi-plus-circle"},
     {"text": "PEIs recebidos", "route": "listar_peis", "icon": "bi bi-list"},
     {"text": "Solicitações NAPNE", "route": "solicitacoes_napne", "icon": "bi bi-person-check"},
+    {"text": "Feedbacks públicos", "route": "listar_feedbacks_publicos", "icon": "bi bi-chat-dots"},
     {"text": "Feedbacks privados", "route": "listar_feedbacks_privados", "icon": "bi bi-chat-left-text"},
     {"text": "Notificações", "route": "listar_notificacoes", "icon": "bi bi-bell"},
     {"text": "Apresentação do NAPNE", "route": "editar_apresentacao_napne", "icon": "bi bi-easel"},
