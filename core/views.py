@@ -4,6 +4,7 @@ from django.db.models import Max
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.core.paginator import Paginator
+from .painel import cards_do_painel
 
 from .decorators import napne_required
 from .downloads import resposta_de_download
@@ -37,6 +38,7 @@ def painel_home(request):
         'total_peis': Pei.objects.count(),
         'total_solicitacoes_pendentes': SolicitacaoNapne.objects.filter(status=SolicitacaoNapne.PENDENTE).count(),
         'total_peis_em_analise': Pei.objects.filter(status=Pei.EM_ANALISE).count(),
+        'cards': cards_do_painel(),
     }
     return render(request, "core/painel_home.html", context)
 
