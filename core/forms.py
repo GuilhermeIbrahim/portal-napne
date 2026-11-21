@@ -4,6 +4,7 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.forms import inlineformset_factory
+from django.conf import settings
 
 from .models import (
     ApresentacaoNapne,
@@ -21,6 +22,7 @@ from .validators import (
     normalizar_nome_estudante,
     normalizar_periodo_letivo,
     titulo_revela_o_estudante,
+    validar_arquivo_pei,
     validar_curso,
     validar_matricula,
     validar_nome_estudante,
@@ -133,8 +135,20 @@ class DadosDoEstudanteMixin:
             self.add_error("titulo", MENSAGEM_TITULO_REVELA_ESTUDANTE)
         return dados
 
+class ArquivoDoPeiMixin:
 
-class PeiForm(DadosDoEstudanteMixin, forms.ModelForm):
+    def configurar_campo_arquivo(self):
+        campo = self.fields["arquivo"]
+        campo.help_text = f"Formatos aceitos: PDF ou DOCX, com até {settings.PEI_TAMANHO_MAXIMO_MB} MB."
+        campo.error_messages["empty"] = "O arquivo está vazio. Selecione o arquivo correto do PEI."
+
+    def clean_arquivo(self):
+        arquivo = self.cleaned_data["arquivo"]
+        validar_arquivo_pei(arquivo)
+        return arquivo
+
+
+class PeiForm(ArquivoDoPeiMixin, DadosDoEstudanteMixin, forms.ModelForm):
     class Meta:
         model = Pei
         fields = ["titulo", *CAMPOS_DO_ESTUDANTE, "arquivo"]
@@ -153,6 +167,8 @@ class PeiForm(DadosDoEstudanteMixin, forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.configurar_campos_do_estudante()
+        self.configurar_campo_arquivo()
+        self.fields["arquivo"].error_messages["required"] = "Selecione o arquivo do PEI."
 
         self.helper = FormHelper()
         self.helper.form_tag = False
@@ -243,7 +259,7 @@ class AnalisePeiForm(forms.Form):
         return dados
 
 
-class NovaVersaoPeiForm(forms.Form):
+class NovaVersaoPeiForm(ArquivoDoPeiMixin, forms.Form):
     arquivo = forms.FileField(
         label="Novo arquivo do PEI (PDF ou DOCX)",
         widget=forms.ClearableFileInput(attrs={"accept": ".pdf, .docx"}),
@@ -258,6 +274,7 @@ class NovaVersaoPeiForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.configurar_campo_arquivo()
 
         self.helper = FormHelper()
         self.helper.form_tag = False
