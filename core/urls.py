@@ -17,6 +17,7 @@ urlpatterns = [
     path('solicitacoes-napne/<int:id>/aprovar/', views.aprovar_solicitacao_napne, name='aprovar_solicitacao_napne'),
     path('solicitacoes-napne/<int:id>/recusar/', views.recusar_solicitacao_napne, name='recusar_solicitacao_napne'),
     path('listar_feedbacks_privados/', views.listar_feedbacks_privados, name='listar_feedbacks_privados'),
+    path('listar_feedbacks_publicos/', views.listar_feedbacks_publicos, name='listar_feedbacks_publicos'),
     path('apresentacao/editar/', views.editar_apresentacao_napne, name='editar_apresentacao_napne'),
     path('notificacoes/', views.listar_notificacoes, name='listar_notificacoes'),
     path('notificacoes/criar/', views.criar_notificacao, name='criar_notificacao'),

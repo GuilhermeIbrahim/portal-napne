@@ -3,6 +3,7 @@ from django.contrib.auth.models import Group
 from django.db.models import Max
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
+from django.core.paginator import Paginator
 
 from .decorators import napne_required
 from .downloads import resposta_de_download
@@ -16,6 +17,7 @@ from .forms import (
 )
 from .models import (
     ApresentacaoNapne,
+    FeedbackPublico,
     FeedbackPrivado,
     Noticia,
     Notificacao,
@@ -202,11 +204,21 @@ def recusar_solicitacao_napne(request, id):
         messages.info(request, f'A solicitação de {solicitacao.user.get_full_name()} foi recusada.')
     return redirect('solicitacoes_napne')
 
+FEEDBACKS_POR_PAGINA = 15
+
+
 @napne_required
 def listar_feedbacks_privados(request):
-    feedbacks = FeedbackPrivado.objects.select_related('autor', 'noticia').order_by('-data')
-    context = {'feedbacks': feedbacks}
-    return render(request, 'core/listar_feedbacks_privados.html', context)
+    feedbacks = FeedbackPrivado.objects.select_related('autor', 'noticia').order_by('-data', '-id')
+    pagina = Paginator(feedbacks, FEEDBACKS_POR_PAGINA).get_page(request.GET.get('page'))
+    return render(request, 'core/listar_feedbacks_privados.html', {'feedbacks': pagina})
+
+
+@napne_required
+def listar_feedbacks_publicos(request):
+    feedbacks = FeedbackPublico.objects.select_related('autor', 'noticia').order_by('-data', '-id')
+    pagina = Paginator(feedbacks, FEEDBACKS_POR_PAGINA).get_page(request.GET.get('page'))
+    return render(request, 'core/listar_feedbacks_publicos.html', {'feedbacks': pagina})
 
 @napne_required
 def editar_apresentacao_napne(request):

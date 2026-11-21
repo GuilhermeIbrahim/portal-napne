@@ -15,9 +15,10 @@
             <thead>
                 <tr>
                     <th>Autor</th>
-                    <th>Notícia vinculada</th>
+                    <th>Notícia</th>
                     <th>Conteúdo</th>
-                    <th>Data</th>
+                    <th>Enviado em</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -28,15 +29,21 @@
                         {% if feedback.noticia %}
                             <a href="{% url 'detalhe' feedback.noticia.id %}">{{ feedback.noticia.titulo }}</a>
                         {% else %}
-                            <span class="text-muted">—</span>
+                            <span class="text-muted">Sem notícia</span>
                         {% endif %}
                     </td>
-                    <td>{{ feedback.conteudo }}</td>
-                    <td>{{ feedback.data }}</td>
+                    <td>{{ feedback.conteudo|truncatechars:120 }}</td>
+                    <td>{{ feedback.data|date:"d/m/Y H:i" }}</td>
+                    <td class="text-end">
+                        <a href="{% url 'detalhar_feedback_privado' feedback.id %}" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-eye"></i> Ver
+                        </a>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
+        {% include "core/_paginacao.html" %}
         {% else %}
             {% component "adminlte_callout" theme="info" title="Nenhum feedback" %}
                 Nenhum feedback privado foi enviado ainda.

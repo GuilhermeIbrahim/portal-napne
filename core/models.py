@@ -21,7 +21,7 @@ class Usuario(AbstractUser):
 class Noticia(models.Model):
     titulo = models.CharField(max_length=100)
     imagem = models.ImageField(upload_to="Noticias", null=True, blank=True)
-    data = models.DateField(auto_now_add=True)
+    data = models.DateTimeField(auto_now_add=True)
     conteudo = CKEditor5Field("Conteúdo", config_name="default")
 
     def __str__(self):
@@ -326,7 +326,7 @@ class SolicitacaoNapne(models.Model):
 class FeedbackPublico(models.Model):
     noticia = models.ForeignKey(Noticia, on_delete=models.CASCADE, related_name='comentarios')
     conteudo = models.TextField(max_length = 500)
-    data = models.DateField(auto_now_add = True)
+    data = models.DateTimeField(auto_now_add = True)
     editado_em =models.DateTimeField(blank=True, null=True)
     autor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
@@ -336,7 +336,7 @@ class FeedbackPublico(models.Model):
 class FeedbackPrivado(models.Model):
     noticia = models.ForeignKey(Noticia, on_delete=models.SET_NULL, null=True, blank=True, related_name='feedbacks_privados')
     conteudo = models.TextField(max_length=500)
-    data = models.DateField(auto_now_add=True)
+    data = models.DateTimeField(auto_now_add=True)
     editado_em =models.DateTimeField(blank=True, null=True)
     autor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 

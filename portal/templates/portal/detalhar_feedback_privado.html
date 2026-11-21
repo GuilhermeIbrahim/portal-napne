@@ -24,7 +24,7 @@
                     <span class="text-muted">Nenhuma</span>
                 {% endif %}
             </p>
-            <p><strong>Enviado em:</strong> {{ feedback.data }}</p>
+            <p><strong>Enviado em:</strong> {{ feedback.data|date:"d/m/Y H:i" }}</p>
             {% if feedback.editado_em %}
                 <p><strong>Editado em:</strong> {{ feedback.editado_em }}</p>
             {% endif %}
