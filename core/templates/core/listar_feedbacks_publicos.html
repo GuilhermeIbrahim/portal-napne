@@ -1,0 +1,55 @@
+{% extends "painel_base.html" %}
+
+{% block page_title %}Feedbacks públicos{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item active">Feedbacks públicos</li>
+{% endblock %}
+
+{% block content %}
+
+    {% component "adminlte_card" title="Feedbacks públicos" icon="bi bi-chat-dots" theme="primary" %}
+
+        {% if feedbacks %}
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>Autor</th>
+                    <th>Notícia</th>
+                    <th>Conteúdo</th>
+                    <th>Enviado em</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for feedback in feedbacks %}
+                <tr>
+                    <td>{{ feedback.autor.get_full_name|default:feedback.autor.username }}</td>
+                    <td>
+                        {% if feedback.noticia %}
+                            <a href="{% url 'detalhe' feedback.noticia.id %}">{{ feedback.noticia.titulo }}</a>
+                        {% else %}
+                            <span class="text-muted">Sem notícia</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ feedback.conteudo|truncatechars:120 }}</td>
+                    <td>{{ feedback.data|date:"d/m/Y H:i" }}</td>
+                    <td class="text-end">
+                        <a href="{% url 'detalhar_feedback_publico' feedback.id %}" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-eye"></i> Ver
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% include "core/_paginacao.html" %}
+        {% else %}
+            {% component "adminlte_callout" theme="info" title="Nenhum feedback" %}
+                Nenhum feedback público foi enviado ainda.
+            {% endcomponent %}
+        {% endif %}
+
+    {% endcomponent %}
+
+{% endblock %}
