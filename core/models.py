@@ -342,6 +342,39 @@ class FeedbackPrivado(models.Model):
 
     def __str__(self):
         return f"Feedback privado de {self.autor}"
+
+
+class RespostaFeedback(models.Model):
+    feedback_publico = models.OneToOneField(
+        FeedbackPublico, on_delete=models.CASCADE, null=True, blank=True, related_name='resposta',
+    )
+    feedback_privado = models.OneToOneField(
+        FeedbackPrivado, on_delete=models.CASCADE, null=True, blank=True, related_name='resposta',
+    )
+    autor = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='respostas_de_feedback',
+    )
+    conteudo = models.TextField(max_length=500)
+    criado_em = models.DateTimeField(auto_now_add=True)
+    editado_em = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                condition=(
+                    models.Q(feedback_publico__isnull=False, feedback_privado__isnull=True)
+                    | models.Q(feedback_publico__isnull=True, feedback_privado__isnull=False)
+                ),
+                name='resposta_de_um_unico_feedback',
+            ),
+        ]
+
+    @property
+    def feedback(self):
+        return self.feedback_publico or self.feedback_privado
+
+    def __str__(self):
+        return f"Resposta de {self.autor} ao feedback de {self.feedback.autor}"
     
 class ApresentacaoNapne(models.Model):
     titulo = models.CharField(max_length=200, default="Conheça o NAPNE")
