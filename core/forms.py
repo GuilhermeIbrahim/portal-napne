@@ -14,6 +14,7 @@ from .models import (
     Noticia,
     Notificacao,
     Pei,
+    RespostaFeedback,
 )
 from .validators import (
     MENSAGEM_TITULO_REVELA_ESTUDANTE,
@@ -470,3 +471,15 @@ class NotificacaoForm(forms.ModelForm):
             cleaned_data["destinatario"] = None
 
         return cleaned_data
+
+class RespostaFeedbackForm(forms.ModelForm):
+    class Meta:
+        model = RespostaFeedback
+        fields = ["conteudo"]
+        labels = {"conteudo": "Resposta do NAPNE"}
+        widgets = {
+            "conteudo": forms.Textarea(attrs={"rows": 5, "placeholder": "Escreva a resposta..."}),
+        }
+        error_messages = {
+            "conteudo": {"required": "Escreva a resposta antes de enviar."},
+        }
