@@ -1,4 +1,5 @@
 {% extends "portal/base.html" %}
+{% load portal_extras %}
 
 {% block title %}Comentário | Portal NAPNE{% endblock %}
 
@@ -29,11 +30,31 @@
             {% endif %}
             <hr>
             <p class="texto-pre-line">{{ feedback.conteudo }}</p>
+
+            {% if feedback.resposta %}
+                <div class="border-start border-4 border-primary bg-light rounded p-3 mt-4">
+                    <p class="fw-bold mb-1"><i class="bi bi-reply"></i> Resposta do NAPNE</p>
+                    <p class="texto-pre-line mb-1">{{ feedback.resposta.conteudo }}</p>
+                    <small class="text-muted">
+                        {{ feedback.resposta.criado_em|date:"d/m/Y H:i" }}
+                        {% if feedback.resposta.editado_em %}(editada em {{ feedback.resposta.editado_em|date:"d/m/Y H:i" }}){% endif %}
+                    </small>
+                </div>
+            {% elif not request.user|has_group:"NAPNE" %}
+                <p class="text-muted small mt-4 mb-0">Ainda sem resposta do NAPNE.</p>
+            {% endif %}
         </div>
         {% if request.user == feedback.autor %}
             <div class="card-footer bg-white d-flex gap-2">
                 <a href="{% url 'editar_feedback_publico' feedback.id %}" class="btn btn-sm btn-warning">
                     <i class="bi bi-pencil"></i> Editar
+                </a>
+            </div>
+        {% endif %}
+        {% if request.user|has_group:"NAPNE" %}
+            <div class="card-footer bg-white d-flex gap-2">
+                <a href="{% url 'responder_feedback_publico' feedback.id %}" class="btn btn-sm btn-primary">
+                    <i class="bi bi-reply"></i> {% if feedback.resposta %}Editar resposta{% else %}Responder{% endif %}
                 </a>
             </div>
         {% endif %}
