@@ -10,6 +10,12 @@
 
     {% component "adminlte_card" title="Feedbacks públicos" icon="bi bi-chat-dots" theme="primary" %}
 
+        <div class="btn-group mb-3" role="group" aria-label="Filtrar por situação">
+            <a href="?" class="btn btn-sm {% if not status %}btn-primary{% else %}btn-outline-primary{% endif %}">Todos</a>
+            <a href="?status=sem_resposta" class="btn btn-sm {% if status == 'sem_resposta' %}btn-primary{% else %}btn-outline-primary{% endif %}">Sem resposta</a>
+            <a href="?status=respondido" class="btn btn-sm {% if status == 'respondido' %}btn-primary{% else %}btn-outline-primary{% endif %}">Respondidos</a>
+        </div>
+
         {% if feedbacks %}
         <table class="table table-hover align-middle">
             <thead>
@@ -18,6 +24,7 @@
                     <th>Notícia</th>
                     <th>Conteúdo</th>
                     <th>Enviado em</th>
+                    <th>Situação</th>
                     <th></th>
                 </tr>
             </thead>
@@ -34,10 +41,26 @@
                     </td>
                     <td>{{ feedback.conteudo|truncatechars:120 }}</td>
                     <td>{{ feedback.data|date:"d/m/Y H:i" }}</td>
-                    <td class="text-end">
-                        <a href="{% url 'detalhar_feedback_publico' feedback.id %}" class="btn btn-sm btn-outline-primary">
+                    <td>
+                        {% if feedback.resposta %}
+                            <span class="badge text-bg-success">Respondido</span>
+                        {% else %}
+                            <span class="badge text-bg-warning">Sem resposta</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-end text-nowrap">
+                        <a href="{% url 'detalhar_feedback_publico' feedback.id %}" class="btn btn-sm btn-outline-secondary">
                             <i class="bi bi-eye"></i> Ver
                         </a>
+                        {% if feedback.resposta %}
+                            <a href="{% url 'responder_feedback_publico' feedback.id %}" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-pencil"></i> Editar resposta
+                            </a>
+                        {% else %}
+                            <a href="{% url 'responder_feedback_publico' feedback.id %}" class="btn btn-sm btn-primary">
+                                <i class="bi bi-reply"></i> Responder
+                            </a>
+                        {% endif %}
                     </td>
                 </tr>
                 {% endfor %}
@@ -46,7 +69,13 @@
         {% include "core/_paginacao.html" %}
         {% else %}
             {% component "adminlte_callout" theme="info" title="Nenhum feedback" %}
-                Nenhum feedback público foi enviado ainda.
+                {% if status == 'sem_resposta' %}
+                    Nenhum feedback público está sem resposta.
+                {% elif status == 'respondido' %}
+                    Nenhum feedback público foi respondido ainda.
+                {% else %}
+                    Nenhum feedback público foi enviado ainda.
+                {% endif %}
             {% endcomponent %}
         {% endif %}
 
