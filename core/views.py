@@ -4,6 +4,9 @@ from django.db.models import Max
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.core.paginator import Paginator
+from django.db import IntegrityError, transaction
+from django.http import Http404
+from django.urls import reverse
 
 from .decorators import napne_required
 from .downloads import resposta_de_download
@@ -14,6 +17,7 @@ from .forms import (
     ImagemCarrosselFormSet,
     NoticiaForm,
     NotificacaoForm,
+    RespostaFeedbackForm,
 )
 from .models import (
     ApresentacaoNapne,
@@ -26,6 +30,7 @@ from .models import (
     SolicitacaoNapne,
     TransicaoPeiInvalida,
     VersaoPei,
+    RespostaFeedback,
 )
 from .validators import normalizar_periodo_letivo
 
@@ -207,18 +212,100 @@ def recusar_solicitacao_napne(request, id):
 FEEDBACKS_POR_PAGINA = 15
 
 
+TIPOS_DE_FEEDBACK = {
+    'publico': (FeedbackPublico, 'listar_feedbacks_publicos', 'detalhar_feedback_publico', 'Feedbacks públicos'),
+    'privado': (FeedbackPrivado, 'listar_feedbacks_privados', 'detalhar_feedback_privado', 'Feedbacks privados'),
+}
+
+
+def _listar_feedbacks(request, tipo):
+    modelo = TIPOS_DE_FEEDBACK[tipo][0]
+    status = request.GET.get('status', '')
+    feedbacks = modelo.objects.select_related('autor', 'noticia', 'resposta').order_by('-data', '-id')
+    if status == 'sem_resposta':
+        feedbacks = feedbacks.filter(resposta__isnull=True)
+    elif status == 'respondido':
+        feedbacks = feedbacks.filter(resposta__isnull=False)
+    else:
+        status = ''
+    pagina = Paginator(feedbacks, FEEDBACKS_POR_PAGINA).get_page(request.GET.get('page'))
+    return render(request, f'core/listar_feedbacks_{tipo}s.html', {'feedbacks': pagina, 'status': status})
+
+
 @napne_required
 def listar_feedbacks_privados(request):
-    feedbacks = FeedbackPrivado.objects.select_related('autor', 'noticia').order_by('-data', '-id')
-    pagina = Paginator(feedbacks, FEEDBACKS_POR_PAGINA).get_page(request.GET.get('page'))
-    return render(request, 'core/listar_feedbacks_privados.html', {'feedbacks': pagina})
+    return _listar_feedbacks(request, 'privado')
 
 
 @napne_required
 def listar_feedbacks_publicos(request):
-    feedbacks = FeedbackPublico.objects.select_related('autor', 'noticia').order_by('-data', '-id')
-    pagina = Paginator(feedbacks, FEEDBACKS_POR_PAGINA).get_page(request.GET.get('page'))
-    return render(request, 'core/listar_feedbacks_publicos.html', {'feedbacks': pagina})
+    return _listar_feedbacks(request, 'publico')
+
+
+@napne_required
+def responder_feedback(request, feedback_id, tipo):
+    modelo, rota_lista, rota_detalhe, titulo_lista = TIPOS_DE_FEEDBACK[tipo]
+    feedback = get_object_or_404(modelo.objects.select_related('autor', 'noticia'), id=feedback_id)
+    resposta = getattr(feedback, 'resposta', None)
+    url_lista = reverse(rota_lista)
+
+    if request.method == 'POST':
+        form = RespostaFeedbackForm(request.POST, instance=resposta)
+        if form.is_valid():
+            try:
+                with transaction.atomic():
+                    salva = form.save(commit=False)
+                    if resposta:
+                        salva.editado_em = timezone.now()
+                    else:
+                        setattr(salva, f'feedback_{tipo}', feedback)
+                        salva.autor = request.user
+                    salva.save()
+                    if not resposta:
+                        Notificacao.objects.create(
+                            titulo='O NAPNE respondeu ao seu feedback',
+                            conteudo=salva.conteudo,
+                            destino_tipo=Notificacao.USUARIO,
+                            destinatario=feedback.autor,
+                            remetente=request.user,
+                            link=reverse(rota_detalhe, args=[feedback.id]),
+                        )
+            except IntegrityError:
+                messages.error(request, 'Este feedback acabou de ser respondido por outra pessoa do NAPNE.')
+                return redirect(request.path)
+            messages.success(request, 'Resposta salva com sucesso!')
+            return redirect(url_lista)
+    else:
+        form = RespostaFeedbackForm(instance=resposta)
+
+    contexto = {
+        'feedback': feedback,
+        'resposta': resposta,
+        'form': form,
+        'url_lista': url_lista,
+        'titulo_lista': titulo_lista,
+        'titulo_card': 'Editar resposta' if resposta else 'Sua resposta',
+    }
+    return render(request, 'core/responder_feedback.html', contexto)
+
+
+@napne_required
+def excluir_resposta_feedback(request, resposta_id):
+    resposta = get_object_or_404(RespostaFeedback, id=resposta_id)
+    tipo = 'publico' if resposta.feedback_publico_id else 'privado'
+    _, rota_lista, _, titulo_lista = TIPOS_DE_FEEDBACK[tipo]
+    if request.method == 'POST':
+        resposta.delete()
+        messages.success(request, 'Resposta excluída.')
+        return redirect(rota_lista)
+    contexto = {
+        'resposta': resposta,
+        'url_lista': reverse(rota_lista),
+        'titulo_lista': titulo_lista,
+        'url_responder': reverse(f'responder_feedback_{tipo}', args=[resposta.feedback.id]),
+    }
+    return render(request, 'core/excluir_resposta_feedback.html', contexto)
+
 
 @napne_required
 def editar_apresentacao_napne(request):
