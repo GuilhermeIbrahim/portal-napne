@@ -9,64 +9,25 @@
 {% block content %}
 
     <div class="row">
-        <div class="col-md-6 mb-4">
-            {% component "adminlte_card" title="Notícias" icon="bi bi-newspaper" theme="primary" %}
-                {% fill "default" %}
-                    <p class="fs-4 mb-1">{{ total_noticias }}</p>
-                    <p class="text-muted mb-0">notícia(s) publicada(s)</p>
-                {% endfill %}
-                {% fill "footer" %}
-                    <a href="{% url 'index' %}" class="btn btn-sm btn-outline-primary">Ver site público</a>
-                    <a href="{% url 'criar_noticia' %}" class="btn btn-sm btn-primary">
-                        <i class="bi bi-plus-circle"></i> Nova notícia
-                    </a>
-                {% endfill %}
-            {% endcomponent %}
-        </div>
-
-        <div class="col-md-6 mb-4">
-            {% component "adminlte_card" title="PEIs" icon="bi bi-file-earmark-text" theme="primary" %}
-                {% fill "default" %}
-                    <p class="fs-4 mb-1">{{ total_peis }}</p>
-                    <p class="text-muted mb-0">PEI(s) recebido(s)</p>
-                    <p class="mb-0"><strong>{{ total_peis_em_analise }}</strong> aguardando análise</p>
-                {% endfill %}
-                {% fill "footer" %}
-                    <a href="{% url 'listar_peis' %}" class="btn btn-sm btn-primary">
-                        <i class="bi bi-list"></i> Ver PEIs recebidos
-                    </a>
-                {% endfill %}
-            {% endcomponent %}
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-md-6 mb-4">
-            {% component "adminlte_card" title="Solicitações NAPNE" icon="bi bi-person-check" theme="primary" %}
-                {% fill "default" %}
-                    <p class="fs-4 mb-1">{{ total_solicitacoes_pendentes }}</p>
-                    <p class="text-muted mb-0">solicitação(ões) pendente(s)</p>
-                {% endfill %}
-                {% fill "footer" %}
-                    <a href="{% url 'solicitacoes_napne' %}" class="btn btn-sm btn-primary">
-                        <i class="bi bi-person-check"></i> Avaliar solicitações
-                    </a>
-                {% endfill %}
-            {% endcomponent %}
-        </div>
-
-        <div class="col-md-6 mb-4">
-            {% component "adminlte_card" title="Apresentação do NAPNE" icon="bi bi-easel" theme="primary" %}
-                {% fill "default" %}
-                    <p class="text-muted mb-0">Título, texto e carrossel de imagens da tela "Sobre o NAPNE".</p>
-                {% endfill %}
-                {% fill "footer" %}
-                    <a href="{% url 'editar_apresentacao_napne' %}" class="btn btn-sm btn-primary">
-                        <i class="bi bi-pencil"></i> Editar apresentação
-                    </a>
-                {% endfill %}
-            {% endcomponent %}
-        </div>
+        {% for card in cards %}
+            <div class="col-md-6 col-xl-4 mb-4" data-card-painel="{{ card.rota }}">
+                {% component "adminlte_card" title=card.texto icon=card.icone theme="primary" %}
+                    {% fill "default" %}
+                        {% for numero, rotulo in card.metricas %}
+                            <p class="mb-1"><span class="fs-4 fw-bold">{{ numero }}</span> <span class="text-muted">{{ rotulo }}</span></p>
+                        {% endfor %}
+                        {% if card.descricao %}
+                            <p class="text-muted mb-0">{{ card.descricao }}</p>
+                        {% endif %}
+                    {% endfill %}
+                    {% fill "footer" %}
+                        <a href="{{ card.url }}" class="btn btn-sm btn-primary">
+                            <i class="{{ card.icone }}"></i> {{ card.texto }}
+                        </a>
+                    {% endfill %}
+                {% endcomponent %}
+            </div>
+        {% endfor %}
     </div>
 
 {% endblock %}
